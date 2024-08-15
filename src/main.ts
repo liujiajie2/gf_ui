@@ -33,7 +33,7 @@ app.component('pagination', pagination)
 app.use(pinia)
     .use(uploader)
     .use(router)
-    .use(ElementPlus, { i18n: i18n.global.t })
+    .use(ElementPlus)
     .use(i18n)
     .use(VueGridLayout)
     .mount('#app');
