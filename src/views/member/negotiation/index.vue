@@ -93,7 +93,7 @@
         </el-col>
       </el-row>
 
-      <el-table :data="tableData" stripe>
+      <el-table :data="dataDisplayState.tableData" stripe>
         <!-- 通过条件渲染控制列显示 -->
         <el-table-column v-if="checkedColumns.includes('serviceID')" prop="serviceID" label="服务ID" width="150" />
         <el-table-column v-if="checkedColumns.includes('serviceName')" prop="serviceName" label="服务名" width="200" />
@@ -118,30 +118,21 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { NegotiationFormState, getDefaultNegotiationFormState } from '/@/views/member/negotiation/component/model';
-import { addNegotiation,listNegotiation } from '/@/api/member/negotiation';
-import service from '/@/utils/request';
+import { NegotiationFormState, getDefaultNegotiationFormState, DataDisplayState, getDefaultDataDisplayState } from '/@/views/member/negotiation/component/model';
+import { addNegotiation, listNegotiation } from '/@/api/member/negotiation';
 
 export default defineComponent({
   name: 'NegotiationPage',
   setup() {
-    const formState = ref(getDefaultNegotiationFormState());
+    // 表单状态
+    const formState = ref<NegotiationFormState>(getDefaultNegotiationFormState());
     const formData = formState.value.formData;
     const rules = formState.value.rules;
     const negotiationForm = ref();
     const statusMessage = ref<string | null>(null);
 
-    interface TableData {
-      serviceID: string;
-      serviceName: string;
-      databaseName: string;
-      tableName: string;
-      requestStatus: string;
-      remarks: string;
-      operation: string;
-    }
-    
-    const tableData = ref<TableData[]>([]);
+    // 数据展示状态
+    const dataDisplayState = ref<DataDisplayState>(getDefaultDataDisplayState());
 
     const checkedColumns = ref<string[]>([
       'serviceID',
@@ -153,57 +144,55 @@ export default defineComponent({
       'operation',
     ]);
 
-
-
-        // 表单提交函数
+    // 表单提交函数
     const submitForm = () => {
       negotiationForm.value.validate((valid: boolean) => {
         if (valid) {
-          // 调用后端 API 提交表单数据
-          console.log("表单数据:", formData); // 在调用 API 之前，先打印一下表单数据
           const dataToSend = {
             serviceName: formData.serviceName,
             providerID: formData.providerID,
-            servideOwnerID: 0,
+            serviceOwnerID: 0,
             databaseName: formData.databaseName,
             tableName: formData.tableName,
-          }
-          addNegotiation(dataToSend).then((response) => {
-            console.log("response:", response.data.code);
-            if (response.data.code === 200) {
-              ElMessage.success('提交成功');
-              tableData.value.push({
-                serviceID: response.data.serviceID, // 假设返回了新增记录的ID
-                serviceName: dataToSend.serviceName,
-                databaseName: dataToSend.databaseName,
-                tableName: dataToSend.tableName,
-                requestStatus: 'start',
-                remarks: '',
-                operation: '',
-              });
-              resetForm(); // 重置表单
-            } else {
-              ElMessage.error('提交失败');
-            }
-          }).catch(() => {
-            ElMessage.error('网络错误，请稍后重试');
-          });
+          };
+
+          addNegotiation(dataToSend)
+            .then((response) => {
+              if (response.data.status === 'success') {
+                ElMessage.success('提交成功');
+                //console.log('Current tableData:', dataDisplayState.value.tableData);
+                console.log('response:', response);
+                // 更新 dataDisplayState.tableData
+                dataDisplayState.value.tableData.push({
+                  serviceID: response.data.serviceID,
+                  serviceName: dataToSend.serviceName,
+                  databaseName: dataToSend.databaseName,
+                  tableName: dataToSend.tableName,
+                  requestStatus: 'start',
+                  remarks: '',
+                });
+                
+                resetForm();
+              } else {
+                ElMessage.error('提交失败');
+              }
+            })
+            .catch(() => {
+              
+              ElMessage.error('网络错误，请稍后重试');
+            });
         } else {
           ElMessage.error('请完善表单信息');
         }
       });
     };
 
-
     // 重置表单函数
     const resetForm = () => {
+      negotiationForm.value.resetFields();
       formState.value = getDefaultNegotiationFormState();
       statusMessage.value = null;
     };
-    // const resetForm = () => {
-    //   negotiationForm.value.resetFields();
-    //   statusMessage.value = null;
-    // };
 
     const handleEdit = (row: any) => {
       console.log('Edit', row);
@@ -217,17 +206,19 @@ export default defineComponent({
       console.log('Create Table', row);
     };
 
-       // 加载表格数据
+    // 加载表格数据
     const loadTableData = () => {
-      listNegotiation({}).then((response) => {
-        if (response.data.code === 200) {
-          tableData.value = response.data;
-        } else {
-          ElMessage.error('获取数据失败');
-        }
-      }).catch(() => {
-        ElMessage.error('网络错误，请稍后重试');
-      });
+      listNegotiation({})
+        .then((response) => {
+          if (response.data.status === 'success') {
+            dataDisplayState.value.tableData = response.data.tableData;
+          } else {
+            ElMessage.error('获取数据失败');
+          }
+        })
+        .catch(() => {
+          ElMessage.error('网络错误，请稍后重试');
+        });
     };
 
     // 页面加载时调用加载数据
@@ -240,39 +231,20 @@ export default defineComponent({
       rules,
       negotiationForm,
       statusMessage,
-      tableData,
+      dataDisplayState,
       checkedColumns,
       submitForm,
       resetForm,
       handleEdit,
       handleView,
       handleCreateTable,
-     // loadTableData,
     };
   },
 });
 </script>
 
-    <!-- // const submitForm = () => {
-    //   negotiationForm.value.validate((valid: boolean) => {
-    //     if (valid) {
-    //       tableData.value.push({
-    //         serviceID: `ID-${Date.now()}`,
-    //         serviceName: formData.serviceName,
-    //         databaseName: formData.databaseName,
-    //         tableName: formData.tableName,
-    //         requestStatus: 'start',
-    //         remarks: '',
-    //         operation: '',
-    //       });
 
-    //       statusMessage.value = `成功提交了服务：${formData.serviceName}，数据库：${formData.databaseName}`;
-    //       ElMessage.success('提交成功');
-    //     } else {
-    //       ElMessage.error('请完善表单信息');
-    //     }
-    //   });
-    // }; -->
+
 
 <style scoped>
 .negotiation-container {

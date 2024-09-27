@@ -11,6 +11,18 @@ export interface NegotiationFormState {
     };
 }
 
+export interface DataDisplayState {
+    tableData: Array<{
+        serviceID: number;      // 服务ID
+        serviceName: string;    // 服务名
+        databaseName: string;   // 数据库名称
+        tableName: string;      // 数据表名称
+        requestStatus: string;   // 请求状态
+        remarks: string | null;        // 备注
+        // operation 字段可以省略，因为不需要传输信息
+    }>;
+}
+
 // 获取默认的表单状态
 export function getDefaultNegotiationFormState(): NegotiationFormState {
     return {
@@ -30,9 +42,11 @@ export function getDefaultNegotiationFormState(): NegotiationFormState {
     };
 }
 
-// 定义服务 ID 的数据结构
-export const service_id = [
-    { value: 1, label: '服务1' },
-    { value: 2, label: '服务2' },
-    // 更多选项
-];
+
+
+// 获取默认的展示栏数据状态
+export function getDefaultDataDisplayState(): DataDisplayState {
+    return {
+        tableData: [],
+    };
+}
