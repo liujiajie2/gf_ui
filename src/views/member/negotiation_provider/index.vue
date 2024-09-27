@@ -100,7 +100,7 @@ import { defineComponent, ref } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import { service_id } from '../negotiation/component/model';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
+//import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export default defineComponent({
   name: 'ProviderPage',
