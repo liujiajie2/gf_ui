@@ -10,40 +10,11 @@
         <el-row>
           <!-- 服务名 -->
           <el-col :span="24">
-            <el-form-item label="服务名" prop="serviceName">
-              <el-input v-model="formData.serviceName" placeholder="请输入服务名"></el-input>
-            </el-form-item>
-          </el-col>
-
-          <!-- 提供方名 -->
-          <el-col :span="24">
-            <el-form-item label="提供方名" prop="providerName">
-              <el-input v-model="formData.providerName" placeholder="请输入提供方名"></el-input>
-            </el-form-item>
-          </el-col>
-
-          <!-- handle名 -->
-          <el-col :span="24">
-            <el-form-item label="handleName" prop="handleName">
-              <el-input v-model="formData.handleName" placeholder="请输入handle名"></el-input>
-            </el-form-item>
-          </el-col>
-
-          <!-- 数据库名 -->
-          <el-col :span="24">
-            <el-form-item label="数据库名" prop="databaseName">
-              <el-input v-model="formData.databaseName" placeholder="请输入数据库名"></el-input>
-            </el-form-item>
-          </el-col>
-
-          <!-- 数据表名 -->
-          <el-col :span="24">
-            <el-form-item label="数据表名" prop="tableName">
-              <el-input v-model="formData.tableName" placeholder="请输入数据表名"></el-input>
+            <el-form-item label="服务ID" prop="serviceID">
+              <el-input v-model="formData.serviceID" placeholder="请输入服务ID"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
-
         <!-- 提交和重置按钮 -->
         <el-row>
           <el-col :span="24" class="button-row">
@@ -108,11 +79,7 @@ export default defineComponent({
     const formData = ref<ExchangeForm>(getDefaultExchangeForm());
 
     const rules = {
-      serviceName: [{ required: true, message: '请输入服务名', trigger: 'blur' }],
-      providerName: [{ required: true, message: '请输入提供方名', trigger: 'blur' }],
-      handleName: [{ required: true, message: '请输入handle名', trigger: 'blur' }],
-      databaseName: [{ required: true, message: '请输入数据库名', trigger: 'blur' }],
-      tableName: [{ required: true, message: '请输入数据表名', trigger: 'blur' }]
+      serviceID: [{ required: true, message: '请输入服务ID', trigger: 'blur' }],
     };
 
     const exchangeForm = ref<FormInstance | null>(null);

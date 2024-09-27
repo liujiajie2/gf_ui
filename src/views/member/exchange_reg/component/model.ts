@@ -51,11 +51,7 @@
 
 // 定义表单数据结构
 export interface ExchangeForm {
-    serviceName: string;   // 服务名
-    providerName: string;  // 提供方名
-    handleName: string;    // handle名
-    databaseName: string;  // 数据库名
-    tableName: string;     // 数据表名
+    serviceID: number;   // 服务ID
 }
 
 // 定义表格数据结构
@@ -69,10 +65,6 @@ export interface ExchangeTableData {
 // 定义初始表单数据
 export function getDefaultExchangeForm(): ExchangeForm {
     return {
-        serviceName: '',
-        providerName: '',
-        handleName: '',
-        databaseName: '',
-        tableName: ''
+        serviceID: 0,
     };
 }
