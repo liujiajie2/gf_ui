@@ -176,7 +176,7 @@ export default defineComponent({
 
 const submitForm = async () => {
   formState.loading = true;
-
+  console.log('form:', formRef.value);
   try {
     // 检查 formRef 是否存在
     if (formRef.value) {
@@ -214,6 +214,7 @@ const submitForm = async () => {
     };
 
     return {
+      formRef,
       formState,
       addKeyValueContent,
       addFieldContent,
