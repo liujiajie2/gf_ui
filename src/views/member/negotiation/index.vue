@@ -156,7 +156,7 @@ export default defineComponent({
           const dataToSend = {
             serviceName: formData.serviceName,
             providerID: formData.providerID,
-            serviceOwnerID: 0,
+            serviceOwnerID: 12,
             databaseName: formData.databaseName,
             tableName: formData.tableName,
           };
