@@ -13,13 +13,12 @@ export interface NegotiationFormState {
 
 export interface DataDisplayState {
     tableData: Array<{
-        serviceID: number;      // 服务ID
-        serviceName: string;    // 服务名
-        databaseName: string;   // 数据库名称
-        tableName: string;      // 数据表名称
-        requestStatus: string;   // 请求状态
-        remarks: string | null;        // 备注
-        // operation 字段可以省略，因为不需要传输信息
+        service_id: number;      // 服务ID, 对应后端的 service_id
+        service_name: string;    // 服务名, 对应后端的 service_name
+        db_name: string;   // 数据库名称, 对应后端的 db_name
+        table_name: string;      // 数据表名称, 对应后端的 table_name
+        status: string;   // 请求状态, 对应后端的 status
+        remarks: string | null; // 备注（可以保留）
     }>;
 }
 
@@ -41,8 +40,6 @@ export function getDefaultNegotiationFormState(): NegotiationFormState {
         },
     };
 }
-
-
 
 // 获取默认的展示栏数据状态
 export function getDefaultDataDisplayState(): DataDisplayState {

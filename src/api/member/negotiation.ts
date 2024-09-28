@@ -5,7 +5,7 @@ export function listNegotiation(query: object) {
     return request({
         url: 'http://127.0.0.1:8808/api/v1/system/handle/negotiationList', // 使用模板中的URL
         method: 'post',
-        params: query
+        data: query
     });
 }
 

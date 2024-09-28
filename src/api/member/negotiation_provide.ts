@@ -1,10 +1,3 @@
-//  src/api/member/negotiation_provide.ts
-
-
-//由于我是基于gfast框架设计前端的，因此我需要针对这个页面设计一个接口文件，目前接口主要实现的功能是，接受需求方（后端）的数据（数据库名，数据表名，服务名，服务方ID），根据业务逻辑自动填充其他列信息展示到页面中。另外一个功能是，将输入框中的信息再传输给后端，请按照以下接口代码的规范，帮我针对这个新的页面设计一个新的接口文件：
-
-
-import { da } from 'element-plus/es/locale';
 import request from '/@/utils/request'
 
 // 获取数据交换请求列表
