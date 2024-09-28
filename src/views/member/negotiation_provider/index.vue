@@ -86,6 +86,43 @@
         <el-form-item label="安全表名" prop="secureTableName">
           <el-input v-model="editForm.secureTableName" placeholder="请输入安全表名"></el-input>
         </el-form-item>
+
+        <!-- 新增字段部分 -->
+        <div v-if="editForm.allowCreateTable === '同意'">
+          <el-form-item v-for="(field, index) in editForm.newFields" :key="index">
+            <el-form-item label="字段名" prop="field.name">
+              <el-input v-model="field.name" placeholder="字段名"></el-input>
+            </el-form-item>
+            <el-form-item label="字段类型" prop="field.type">
+              <el-input v-model="field.type" placeholder="字段类型"></el-input>
+            </el-form-item>
+            <el-form-item label="是否为主键" prop="field.isPrimaryKey">
+              <el-select v-model="field.isPrimaryKey" label="是否为主键" placeholder="是否为主键">
+                <el-option label="是" value="true"></el-option>
+                <el-option label="否" value="false"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="是否脱敏" prop="field.isSensitive">
+              <el-select v-model="field.isSensitive" placeholder="是否脱敏">
+                <el-option label="是" value="true"></el-option>
+                <el-option label="否" value="false"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="field.isSensitive === 'true'" label="脱敏后字段名" prop="field.desensitizedFieldName">
+              <el-input v-model="field.desensitizedFieldName" placeholder="脱敏后字段名"></el-input>
+            </el-form-item>
+            <el-button type="danger" @click="removeField(index)">删除</el-button>
+          </el-form-item>
+          <el-button type="primary" @click="addField">新增字段</el-button>
+        </div>
+
+        <!-- 不同意理由 -->
+        <div v-if="editForm.allowCreateTable === '不同意'">
+          <el-form-item label="不同意理由" prop="reason">
+            <el-input v-model="editForm.reason" type="textarea" placeholder="请输入不同意理由"></el-input>
+          </el-form-item>
+        </div>
+
         <el-form-item>
           <el-button type="primary" @click="submitEdit">提交</el-button>
           <el-button @click="cancelEdit">取消</el-button>
@@ -96,11 +133,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import { service_id } from '../negotiation/component/model';
-//import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export default defineComponent({
   name: 'ProviderPage',
@@ -120,7 +155,9 @@ export default defineComponent({
     const editForm = ref({
       service_id: '',
       allowCreateTable: '同意',
-      secureTableName: ''
+      secureTableName: '',
+      newFields: [] as { name: string, type: string, isPrimaryKey: string, isSensitive: string, desensitizedFieldName: string }[],
+      reason: ''
     });
     const checkedColumns = ref([
       'service_id',
@@ -137,23 +174,21 @@ export default defineComponent({
       try {
         const defaultParams = {
             user_type: 'provider',
-            provider_id: '1234'
+            provider_id: 1234
         };
         const response = await axios.post('http://localhost:8808/api/v1/system/handle/negotiationList', defaultParams);
-        
+
         tableData.value = response.data.data.items;
-        console.log(response.data);
-        console.log("ddddddddddddddddddddddddddddd");
-        console.log(tableData.value);
       } catch (error) {
         ElMessage.error('获取数据失败');
+        console.error(error);
       }
     };
 
     // 编辑按钮处理
     const handleEdit = (row: any) => {
       isEditing.value = true;
-      editForm.value = { ...row };
+      editForm.value = { ...row, newFields: [], reason: '' };
     };
 
     // 点击编辑按钮
@@ -178,8 +213,26 @@ export default defineComponent({
       isEditing.value = false;
     };
 
+    // 新增字段
+    const addField = () => {
+      editForm.value.newFields.push({
+        name: '',
+        type: '',
+        isPrimaryKey: '否',
+        isSensitive: '否',
+        desensitizedFieldName: ''
+      });
+    };
+
+    // 删除字段
+    const removeField = (index: number) => {
+      editForm.value.newFields.splice(index, 1);
+    };
+
     // 初始加载数据
-    fetchTableData();
+    onMounted(() => {
+      fetchTableData();
+    });
 
     return {
       tableData,
@@ -189,7 +242,9 @@ export default defineComponent({
       handleEdit,
       handleEditButtonClick,
       submitEdit,
-      cancelEdit
+      cancelEdit,
+      addField,
+      removeField
     };
   }
 });
@@ -199,54 +254,243 @@ export default defineComponent({
 .provider-container {
   padding: 20px;
   position: relative;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
-.edit-button {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
+.form-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e4e7ed;
+  padding-bottom: 10px;
 }
 
-.edit-form {
-  margin-top: 20px;
+.form-header h3 {
+  font-size: 24px;
+  color: #303133;
+  margin: 0;
+}
+
+.el-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-card__body {
+  padding: 20px;
 }
 
 .el-table th {
-  background-color: #f5f5f5;
+  background-color: #f5f7fa;
+  color: #303133;
+  font-weight: 600;
 }
 
 .el-table th, .el-table td {
-  padding: 8px 10px;
+  padding: 12px 10px;
+  border-bottom: 1px solid #e4e7ed;
 }
 
 .el-table th + th {
   border-left: 1px solid #fff;
 }
 
-/* 第一行的特定样式 */
 .el-table thead tr th {
-  background-color: #dcdcdc;
+  background-color: #dcdfe6;
 }
 
-.el-input {
+.el-input, .el-select, .el-textarea {
   width: 100%;
+  border-radius: 4px;
 }
 
-/* 操作按钮样式 */
+.el-input__inner {
+  height: 32px;
+  line-height: 32px;
+}
+
+.el-button {
+  border-radius: 4px;
+}
+
+.el-button--primary {
+  background-color: #409eff;
+  border-color: #409eff;
+}
+
+.el-button--primary:hover {
+  background-color: #66b1ff;
+  border-color: #66b1ff;
+}
+
+.el-button--danger {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+.el-button--danger:hover {
+  background-color: #f78989;
+  border-color: #f78989;
+}
+
 .action-buttons {
   display: flex;
-  gap: 10px; /* 调整按钮之间的间距 */
-  justify-content: flex-start; /* 确保按钮靠左对齐 */
+  gap: 10px;
+  justify-content: flex-start;
 }
 
 .action-button {
-  background-color: #409EFF; /* 蓝底 */
-  color: #fff; /* 白字 */
-  border: none; /* 去掉默认边框 */
-  border-radius: 4px; /* 可选的圆角 */
+  background-color: #409eff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+.action-button:hover {
+  background-color: #66b1ff;
 }
 
 .table-wrapper {
-  overflow-x: auto; /* 添加水平滚动条 */
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.edit-button {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: #409eff;
+  border-color: #409eff;
+}
+
+.edit-button:hover {
+  background-color: #66b1ff;
+  border-color: #66b1ff;
+}
+
+.edit-form {
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-form-item__label {
+  color: #606266;
+  font-weight: 600;
+}
+
+.el-form-item__content {
+  margin-left: 120px;
+}
+
+.el-form-item__error {
+  color: #f56c6c;
+}
+
+.el-radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.el-radio__label {
+  color: #606266;
+}
+
+.el-radio__input.is-checked + .el-radio__label {
+  color: #409eff;
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: #409eff;
+  background-color: #409eff;
+}
+
+.el-radio__inner:hover {
+  border-color: #409eff;
+}
+
+.el-radio__inner {
+  border-color: #dcdfe6;
+}
+
+.el-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.el-checkbox__label {
+  color: #606266;
+}
+
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #409eff;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  border-color: #409eff;
+  background-color: #409eff;
+}
+
+.el-checkbox__inner:hover {
+  border-color: #409eff;
+}
+
+.el-checkbox__inner {
+  border-color: #dcdfe6;
+}
+
+.el-dropdown-menu {
+  border-radius: 4px;
+}
+
+.el-dropdown-menu__item {
+  color: #606266;
+}
+
+.el-dropdown-menu__item:hover {
+  background-color: #f5f7fa;
+  color: #409eff;
+}
+
+.el-tooltip__popper {
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-tooltip__popper .popper__arrow {
+  border-color: #f5f7fa;
+}
+
+.el-tooltip__popper[x-placement^="top"] .popper__arrow {
+  border-top-color: #f5f7fa;
+}
+
+.el-tooltip__popper[x-placement^="bottom"] .popper__arrow {
+  border-bottom-color: #f5f7fa;
+}
+
+.el-tooltip__popper[x-placement^="left"] .popper__arrow {
+  border-left-color: #f5f7fa;
+}
+
+.el-tooltip__popper[x-placement^="right"] .popper__arrow {
+  border-right-color: #f5f7fa;
+}
+
+/* 新增字段部分的文本框大小调整 */
+.el-form-item__content .el-input,
+.el-form-item__content .el-select,
+.el-form-item__content .el-textarea {
+  width: 200px; /* 调整宽度 */
+}
+
+.el-form-item__content .el-input__inner {
+  height: 32px; /* 调整高度 */
+  line-height: 32px; /* 调整行高 */
+}
+
+.el-form-item__content .el-textarea__inner {
+  height: 80px; /* 调整高度 */
 }
 </style>
