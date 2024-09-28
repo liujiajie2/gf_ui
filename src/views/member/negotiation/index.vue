@@ -54,6 +54,12 @@
         <el-col :span="24">
           <div class="data-request">数据请求</div>
         </el-col>
+
+        <!-- 刷新按钮 -->
+        <el-col :span="24" class="refresh-button">
+          <el-button type="primary" @click="loadTableData">刷新数据</el-button>
+        </el-col>
+        
         <!-- 展示列控制 -->
         <el-col :span="24" class="column-control">
           <el-tooltip content="选择展示列" placement="top">
@@ -95,11 +101,11 @@
 
       <el-table :data="dataDisplayState.tableData" stripe>
         <!-- 通过条件渲染控制列显示 -->
-        <el-table-column v-if="checkedColumns.includes('serviceID')" prop="serviceID" label="服务ID" width="150" />
-        <el-table-column v-if="checkedColumns.includes('serviceName')" prop="serviceName" label="服务名" width="200" />
-        <el-table-column v-if="checkedColumns.includes('databaseName')" prop="databaseName" label="数据库名称" width="200" />
-        <el-table-column v-if="checkedColumns.includes('tableName')" prop="tableName" label="数据表名称" width="200" />
-        <el-table-column v-if="checkedColumns.includes('requestStatus')" prop="requestStatus" label="请求状态" width="150" />
+        <el-table-column v-if="checkedColumns.includes('serviceID')" prop="service_id" label="服务ID" width="150" />
+        <el-table-column v-if="checkedColumns.includes('serviceName')" prop="service_name" label="服务名" width="200" />
+        <el-table-column v-if="checkedColumns.includes('databaseName')" prop="db_name" label="数据库名称" width="200" />
+        <el-table-column v-if="checkedColumns.includes('tableName')" prop="table_name" label="数据表名称" width="200" />
+        <el-table-column v-if="checkedColumns.includes('requestStatus')" prop="status" label="请求状态" width="150" />
         <el-table-column v-if="checkedColumns.includes('remarks')" prop="remarks" label="备注" width="200" />
         <el-table-column v-if="checkedColumns.includes('operation')" label="操作" width="250">
           <template #default="scope">
@@ -129,7 +135,6 @@ export default defineComponent({
     const formData = formState.value.formData;
     const rules = formState.value.rules;
     const negotiationForm = ref();
-    const statusMessage = ref<string | null>(null);
 
     // 数据展示状态
     const dataDisplayState = ref<DataDisplayState>(getDefaultDataDisplayState());
@@ -155,30 +160,18 @@ export default defineComponent({
             databaseName: formData.databaseName,
             tableName: formData.tableName,
           };
-
+          
           addNegotiation(dataToSend)
             .then((response) => {
               if (response.data.status === 'success') {
                 ElMessage.success('提交成功');
-                //console.log('Current tableData:', dataDisplayState.value.tableData);
-                console.log('response:', response);
-                // 更新 dataDisplayState.tableData
-                dataDisplayState.value.tableData.push({
-                  serviceID: response.data.serviceID,
-                  serviceName: dataToSend.serviceName,
-                  databaseName: dataToSend.databaseName,
-                  tableName: dataToSend.tableName,
-                  requestStatus: 'start',
-                  remarks: '',
-                });
-                
+                console.log('response', response);
                 resetForm();
               } else {
                 ElMessage.error('提交失败');
               }
             })
             .catch(() => {
-              
               ElMessage.error('网络错误，请稍后重试');
             });
         } else {
@@ -191,7 +184,6 @@ export default defineComponent({
     const resetForm = () => {
       negotiationForm.value.resetFields();
       formState.value = getDefaultNegotiationFormState();
-      statusMessage.value = null;
     };
 
     const handleEdit = (row: any) => {
@@ -208,10 +200,17 @@ export default defineComponent({
 
     // 加载表格数据
     const loadTableData = () => {
-      listNegotiation({})
+      const query = {
+        user_type:"owner",
+        owner_id:12,
+      }
+
+      listNegotiation(query)
         .then((response) => {
+          console.log('response', response);
           if (response.data.status === 'success') {
-            dataDisplayState.value.tableData = response.data.tableData;
+            ElMessage.success('接收成功');
+            dataDisplayState.value.tableData = response.data.items;
           } else {
             ElMessage.error('获取数据失败');
           }
@@ -230,7 +229,6 @@ export default defineComponent({
       formData,
       rules,
       negotiationForm,
-      statusMessage,
       dataDisplayState,
       checkedColumns,
       submitForm,
@@ -238,12 +236,11 @@ export default defineComponent({
       handleEdit,
       handleView,
       handleCreateTable,
+      loadTableData,
     };
   },
 });
 </script>
-
-
 
 
 <style scoped>
@@ -294,5 +291,3 @@ export default defineComponent({
   white-space: nowrap;
 }
 </style>
-
-
