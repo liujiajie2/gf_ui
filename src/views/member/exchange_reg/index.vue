@@ -115,7 +115,7 @@ export default defineComponent({
       getExchangeTableData().then((response: { data: ExchangeTableData[] }) => {
         tableData.value = response.data;
       }).catch(() => {
-        ElMessage.error('获取数据失败');
+        //ElMessage.error('获取数据失败');
       });
     };
 

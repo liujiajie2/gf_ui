@@ -222,7 +222,7 @@ export default defineComponent({
 
     // 页面加载时调用加载数据
     onMounted(() => {
-      loadTableData();
+      //loadTableData();
     });
 
     return {

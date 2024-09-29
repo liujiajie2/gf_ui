@@ -12,7 +12,7 @@ export function submitExchangeData(data: object) {
 // 获取展示列信息
 export function getExchangeTableData() {
     return request({
-        url: '/api/v1/member/demoGen/list',  // 替换为实际后端接口
-        method: 'get',
+        url: 'http://localhost:8808/api/v1/system/exchange/sendExchangeRequest',  // 替换为实际后端接口
+        method: 'post',
     });
 }
