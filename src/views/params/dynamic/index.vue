@@ -72,7 +72,7 @@ export default defineComponent({
 			router.push({
 				name: 'paramsDynamicDetails',
 				params: {
-					t: 'gfast3.2后台管理系统',
+					t: '多方安全计算平台',
 					id: state.value,
 					tagsViewName: state.tagsViewName,
 				},
