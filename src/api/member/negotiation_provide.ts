@@ -3,7 +3,7 @@ import request from '/@/utils/request'
 // 获取数据交换请求列表
 export function listExchangeRequests(query: object) {
     return request({
-        url: 'http://127.0.0.1:8808/api/v1/system/handle/negotiationList', // 模板中的URL
+        url: 'http://${process.env.VUE_APP_API_URL}/api/v1/system/handle/negotiationList', // 模板中的URL
         method: 'post',
     });
 }

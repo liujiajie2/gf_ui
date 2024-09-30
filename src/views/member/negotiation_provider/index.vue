@@ -139,7 +139,7 @@ export default defineComponent({
             user_type: 'provider',
             provider_id: '1234'
         };
-        const response = await axios.post('http://localhost:8808/api/v1/system/handle/negotiationList', defaultParams);
+        const response = await axios.post('http://${process.env.VUE_APP_API_URL}:8808/api/v1/system/handle/negotiationList', defaultParams);
         
         tableData.value = response.data.data.items;
         console.log(response.data);
