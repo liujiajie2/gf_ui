@@ -3,7 +3,7 @@ import request from '/@/utils/request'
 // 查询分类信息列表
 export function listNegotiation(query: object) {
     return request({
-        url: 'http://127.0.0.1:8808/api/v1/system/handle/negotiationList', // 使用模板中的URL
+        url: '/api/v1/system/handle/negotiationList', // 使用模板中的URL
         method: 'post',
         data: query
     });
@@ -12,7 +12,7 @@ export function listNegotiation(query: object) {
 // 新增分类信息
 export function addNegotiation(data: object) {
     return request({
-        url: 'http://127.0.0.1:8808/api/v1/system/handle/negotiation', // 使用模板中的URL
+        url: '/api/v1/system/handle/negotiation', // 使用模板中的URL
         method: 'post',
         data: data
     });
