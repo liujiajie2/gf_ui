@@ -145,6 +145,8 @@ import axios from 'axios';
 
 export default defineComponent({
   name: 'NegotiationPage',
+  components: {
+  },
   setup() {
     // 表单状态
     const formState = ref<NegotiationFormState>(getDefaultNegotiationFormState());
@@ -213,7 +215,7 @@ export default defineComponent({
     };
 
     const handleView = (row: any) => {
-      console.log('View', row);
+      
     };
 
     const isEditing = ref(false);
@@ -260,7 +262,7 @@ export default defineComponent({
 
     // 页面加载时调用加载数据
     onMounted(() => {
-      loadTableData();
+      //loadTableData();
     });
 
     return {
@@ -283,7 +285,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <style scoped>
 .negotiation-container {
