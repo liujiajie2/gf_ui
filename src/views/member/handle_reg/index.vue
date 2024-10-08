@@ -44,10 +44,10 @@
       <el-button @click="addFieldContent(index)" type="primary" class="add-button">增加字段内容</el-button>
 
       <!-- 其他信息 -->
-      <el-form-item label="数据库名" prop="libName">
+      <el-form-item label="拼接算法动态库名" prop="libName">
         <el-input v-model="keyValue.libName"></el-input>
       </el-form-item>
-      <el-form-item label="函数名" prop="funcName">
+      <el-form-item label="拼接算法函数名" prop="funcName">
         <el-input v-model="keyValue.funcName"></el-input>
       </el-form-item>
       <el-form-item label="乱码位数" prop="garbleBitCount">

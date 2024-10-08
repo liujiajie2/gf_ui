@@ -112,7 +112,7 @@
             <div class="button-container">
               <el-button type="primary" class="operation-button" @click="handleEdit(scope.row)">编辑</el-button>
               <el-button type="primary" class="operation-button" @click="handleView(scope.row)">查看</el-button>
-              <el-button type="primary" class="action-button" @click="handleCreateTable(scope.row)">建表</el-button>
+              <el-button type="primary" class="action-button" @click="handleCreateTable(scope.row)" v-if = "scope.row.status === 'agree'">建表</el-button>
             </div>
           </template>
         </el-table-column>

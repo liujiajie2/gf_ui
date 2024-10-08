@@ -99,7 +99,7 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { ElMessage } from 'element-plus';
-import { queryCalculationResult } from "/@/api/member/calculate_reg";
+//import { queryCalculationResult } from "/@/api/member/calculate_reg";
 import type { CalculationForm, CalculationTableData } from './component/model';
 
 export default defineComponent({
@@ -126,18 +126,18 @@ export default defineComponent({
 
     // 查询数据
     const submitForm = () => {
-      calculationForm.value?.validate((valid: boolean) => {
-        if (valid) {
-          queryCalculationResult(formData.value).then((response: { data: CalculationTableData[] }) => {
-            tableData.value = response.data;
-            ElMessage.success('查询成功');
-          }).catch(() => {
-            ElMessage.error('查询失败');
-          });
-        } else {
-          ElMessage.error('请完善表单信息');
-        }
-      });
+      // calculationForm.value?.validate((valid: boolean) => {
+      //   if (valid) {
+      //     queryCalculationResult(formData.value).then((response: { data: CalculationTableData[] }) => {
+      //       tableData.value = response.data;
+      //       ElMessage.success('查询成功');
+      //     }).catch(() => {
+      //       ElMessage.error('查询失败');
+      //     });
+      //   } else {
+      //     ElMessage.error('请完善表单信息');
+      //   }
+      // });
     };
 
     // 重置表单

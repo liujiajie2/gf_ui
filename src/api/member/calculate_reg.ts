@@ -1,26 +1,19 @@
 import request from '/@/utils/request'
 
-// 查询计算结果
-export function queryCalculationResult(params: object) {
+// 发送请求
+export function sendRequset(params: object) {
     return request({
-        url: '/api/v1/calculation/queryResult',
-        method: 'get',
+        url: '/api/v1/system/compute/sendRequest',
+        method: 'post',
         params: params
     })
 }
 
-// 获取计算历史记录
-export function getCalculationHistory() {
-    return request({
-        url: '/api/v1/calculation/history',
-        method: 'get'
-    })
-}
 
 // 保存计算记录
-export function saveCalculationRecord(data: object) {
+export function TaskList(data: object) {
     return request({
-        url: '/api/v1/calculation/saveRecord',
+        url: '/api/v1/system/compute/TaskList',
         method: 'post',
         data: data
     })
