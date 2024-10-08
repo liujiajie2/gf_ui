@@ -77,8 +77,8 @@
         <el-form-item label="服务ID" prop="service_id">
           <el-input v-model="editForm.service_id" placeholder="请输入服务ID"></el-input>
         </el-form-item>
-        <el-form-item label="是否允许建表" prop="allowCreateTable">
-          <el-radio-group v-model="editForm.allowCreateTable">
+        <el-form-item label="是否允许建表" prop="agree">
+          <el-radio-group v-model="editForm.agree">
             <el-radio label="同意">同意</el-radio>
             <el-radio label="不同意">不同意</el-radio>
           </el-radio-group>
@@ -88,28 +88,28 @@
         </el-form-item>
 
         <!-- 新增字段部分 -->
-        <div v-if="editForm.allowCreateTable === '同意'">
-          <el-form-item v-for="(field, index) in editForm.newFields" :key="index">
-            <el-form-item label="字段名" prop="field.name">
-              <el-input v-model="field.name" placeholder="字段名"></el-input>
+        <div v-if="editForm.agree === '同意'">
+          <el-form-item v-for="(field, index) in editForm.secureTableField" :key="index">
+            <el-form-item label="字段名" prop="field.fieldName">
+              <el-input v-model="field.fieldName" placeholder="字段名"></el-input>
             </el-form-item>
-            <el-form-item label="字段类型" prop="field.type">
-              <el-input v-model="field.type" placeholder="字段类型"></el-input>
+            <el-form-item label="字段类型" prop="field.fieldType">
+              <el-input v-model="field.fieldType" placeholder="字段类型"></el-input>
             </el-form-item>
-            <el-form-item label="是否为主键" prop="field.isPrimaryKey">
-              <el-select v-model="field.isPrimaryKey" label="是否为主键" placeholder="是否为主键">
+            <el-form-item label="是否为主键" prop="field.isKey">
+              <el-select v-model="field.isKey" label="是否为主键" placeholder="是否为主键">
                 <el-option label="是" value="true"></el-option>
                 <el-option label="否" value="false"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="是否脱敏" prop="field.isSensitive">
-              <el-select v-model="field.isSensitive" placeholder="是否脱敏">
-                <el-option label="是" value="true"></el-option>
-                <el-option label="否" value="false"></el-option>
+            <el-form-item label="是否脱敏" prop="field.isSecret">
+              <el-select v-model="field.isSecret" placeholder="是否脱敏">
+                <el-option label="是" value="True"></el-option>
+                <el-option label="否" value="False"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-if="field.isSensitive === 'true'" label="脱敏后字段名" prop="field.desensitizedFieldName">
-              <el-input v-model="field.desensitizedFieldName" placeholder="脱敏后字段名"></el-input>
+            <el-form-item v-if="field.isSecret === 'True'" label="脱敏后字段名" prop="field.fieldNameNew">
+              <el-input v-model="field.fieldNameNew" placeholder="脱敏后字段名"></el-input>
             </el-form-item>
             <el-button type="danger" @click="removeField(index)">删除</el-button>
           </el-form-item>
@@ -117,7 +117,7 @@
         </div>
 
         <!-- 不同意理由 -->
-        <div v-if="editForm.allowCreateTable === '不同意'">
+        <div v-if="editForm.agree === '不同意'">
           <el-form-item label="不同意理由" prop="reason">
             <el-input v-model="editForm.reason" type="textarea" placeholder="请输入不同意理由"></el-input>
           </el-form-item>
@@ -154,9 +154,9 @@ export default defineComponent({
     const isEditing = ref(false);
     const editForm = ref({
       service_id: '',
-      allowCreateTable: '同意',
+      agree: '同意',
       secureTableName: '',
-      newFields: [] as { name: string, type: string, isPrimaryKey: string, isSensitive: string, desensitizedFieldName: string }[],
+      secureTableField: [] as { fieldName: string, fieldType: string, isKey: string, isSecret: string, fieldNameNew: string }[],
       reason: ''
     });
     const checkedColumns = ref([
@@ -188,7 +188,7 @@ export default defineComponent({
     // 编辑按钮处理
     const handleEdit = (row: any) => {
       isEditing.value = true;
-      editForm.value = { ...row, newFields: [], reason: '' };
+      editForm.value = { ...row, secureTableField: [], reason: '' };
     };
 
     // 点击编辑按钮
@@ -199,7 +199,7 @@ export default defineComponent({
     // 提交编辑表单
     const submitEdit = async () => {
       try {
-        await axios.put('/api/v1/provider/update', editForm.value);
+        await axios.post('http://localhost:8808/api/v1/system/handle/negotiationAgree', editForm.value);
         ElMessage.success('提交成功');
         isEditing.value = false;
         fetchTableData(); // 重新加载数据
@@ -215,18 +215,18 @@ export default defineComponent({
 
     // 新增字段
     const addField = () => {
-      editForm.value.newFields.push({
-        name: '',
-        type: '',
-        isPrimaryKey: '否',
-        isSensitive: '否',
-        desensitizedFieldName: ''
+      editForm.value.secureTableField.push({
+        fieldName: '',
+        fieldType: '',
+        isKey: '否',
+        isSecret: '否',
+        fieldNameNew: ''
       });
     };
 
     // 删除字段
     const removeField = (index: number) => {
-      editForm.value.newFields.splice(index, 1);
+      editForm.value.secureTableField.splice(index, 1);
     };
 
     // 初始加载数据

@@ -71,7 +71,7 @@
                 <el-dropdown-menu>
                   <el-checkbox-group v-model="checkedColumns">
                     <el-dropdown-item>
-                      <el-checkbox value="serviceID">服务ID</el-checkbox>
+                      <el-checkbox value="service_id">服务ID</el-checkbox>
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-checkbox value="serviceName">服务名</el-checkbox>
@@ -101,7 +101,7 @@
 
       <el-table :data="dataDisplayState.tableData" stripe>
         <!-- 通过条件渲染控制列显示 -->
-        <el-table-column v-if="checkedColumns.includes('serviceID')" prop="service_id" label="服务ID" width="150" />
+        <el-table-column v-if="checkedColumns.includes('service_id')" prop="service_id" label="服务ID" width="150" />
         <el-table-column v-if="checkedColumns.includes('serviceName')" prop="service_name" label="服务名" width="200" />
         <el-table-column v-if="checkedColumns.includes('databaseName')" prop="db_name" label="数据库名称" width="200" />
         <el-table-column v-if="checkedColumns.includes('tableName')" prop="table_name" label="数据表名称" width="200" />
@@ -112,12 +112,27 @@
             <div class="button-container">
               <el-button type="primary" class="operation-button" @click="handleEdit(scope.row)">编辑</el-button>
               <el-button type="primary" class="operation-button" @click="handleView(scope.row)">查看</el-button>
-              <el-button type="primary" class="operation-button" @click="handleCreateTable(scope.row)">建表</el-button>
+              <el-button type="primary" class="action-button" @click="handleCreateTable(scope.row)">建表</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+
+    <!-- 建表表单 -->
+    <el-card shadow="hover" class="edit-form mt15" v-if="isEditing">
+      <el-form :model="creatTableForm" ref="editFormRef" label-width="120px">
+        <el-form-item label="服务ID" prop="service_id">
+          <el-input v-model="creatTableForm.service_id" placeholder="请输入服务ID"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitCreat">提交</el-button>
+          <el-button @click="cancelCreat">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
   </div>
 </template>
 
@@ -126,6 +141,7 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { NegotiationFormState, getDefaultNegotiationFormState, DataDisplayState, getDefaultDataDisplayState } from '/@/views/member/negotiation/component/model';
 import { addNegotiation, listNegotiation } from '/@/api/member/negotiation';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'NegotiationPage',
@@ -140,7 +156,7 @@ export default defineComponent({
     const dataDisplayState = ref<DataDisplayState>(getDefaultDataDisplayState());
 
     const checkedColumns = ref<string[]>([
-      'serviceID',
+      'service_id',
       'serviceName',
       'databaseName',
       'tableName',
@@ -148,6 +164,12 @@ export default defineComponent({
       'remarks',
       'operation',
     ]);
+
+    // 建表按钮处理
+    const handleCreateTable = (row: any) => {
+      isEditing.value = true;
+      creatTableForm.value = { ...row, secureTableField: [], reason: '' };
+    };
 
     // 表单提交函数
     const submitForm = () => {
@@ -194,8 +216,24 @@ export default defineComponent({
       console.log('View', row);
     };
 
-    const handleCreateTable = (row: any) => {
-      console.log('Create Table', row);
+    const isEditing = ref(false);
+    const creatTableForm = ref({
+      service_id: '',
+    });
+
+    const submitCreat = async () => {
+      try {
+        await axios.post('http://localhost:8808/api/v1/system/handle/notify', creatTableForm.value);
+        ElMessage.success('提交成功');
+        isEditing.value = false;
+      } catch (error) {
+        ElMessage.error('提交失败');
+      }
+    };
+
+    // 取消创建
+    const cancelCreat = () => {
+      isEditing.value = false;
     };
 
     // 加载表格数据
@@ -237,6 +275,10 @@ export default defineComponent({
       handleView,
       handleCreateTable,
       loadTableData,
+      submitCreat,
+      cancelCreat,
+      isEditing,
+      creatTableForm
     };
   },
 });
