@@ -3,7 +3,7 @@ import request from '/@/utils/request';
 // 传输前端输入信息到后端
 export function submitExchangeData(data: object) {
     return request({
-        url: 'http://localhost:8808/api/v1/system/exchange/sendExchangeRequest',  // 替换为你实际的后端接口
+        url: 'http://${process.env.VUE_APP_API_URL}/api/v1/system/exchange/sendExchangeRequest',  // 替换为你实际的后端接口
         method: 'post',
         data: data
     });

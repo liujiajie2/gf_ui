@@ -176,8 +176,13 @@ export default defineComponent({
             user_type: 'provider',
             provider_id: 1234
         };
+<<<<<<< HEAD
         const response = await axios.post('http://localhost:8808/api/v1/system/handle/negotiationList', defaultParams);
 
+=======
+        const response = await axios.post('http://${process.env.VUE_APP_API_URL}:8808/api/v1/system/handle/negotiationList', defaultParams);
+        
+>>>>>>> e13c36c35ab9ff2717730dea087815fa7ce229ec
         tableData.value = response.data.data.items;
       } catch (error) {
         ElMessage.error('获取数据失败');
