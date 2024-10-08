@@ -112,12 +112,20 @@
             <div class="button-container">
               <el-button type="primary" class="operation-button" @click="handleEdit(scope.row)">编辑</el-button>
               <el-button type="primary" class="operation-button" @click="handleView(scope.row)">查看</el-button>
-              <el-button type="primary" class="operation-button" @click="handleCreateTable(scope.row)">建表</el-button>
+              <el-button
+                type="primary"
+                class="operation-button"
+                @click="handleCreateTable(scope.row)"
+                v-if="scope.row.status === 'agree'"
+              >建表</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+
+    <!-- 引入 detail.vue 组件 -->
+    <negotiation-detail ref="detailRef" />
   </div>
 </template>
 
@@ -126,9 +134,13 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { NegotiationFormState, getDefaultNegotiationFormState, DataDisplayState, getDefaultDataDisplayState } from '/@/views/member/negotiation/component/model';
 import { addNegotiation, listNegotiation } from '/@/api/member/negotiation';
+import NegotiationDetail from '/@/views/member/negotiation/component/detail.vue'; // 引入 detail.vue 组件
 
 export default defineComponent({
   name: 'NegotiationPage',
+  components: {
+    NegotiationDetail, // 注册 detail.vue 组件
+  },
   setup() {
     // 表单状态
     const formState = ref<NegotiationFormState>(getDefaultNegotiationFormState());
@@ -148,6 +160,8 @@ export default defineComponent({
       'remarks',
       'operation',
     ]);
+
+    const detailRef = ref<InstanceType<typeof NegotiationDetail> | null>(null); // 引用 detail.vue 组件
 
     // 表单提交函数
     const submitForm = () => {
@@ -191,7 +205,11 @@ export default defineComponent({
     };
 
     const handleView = (row: any) => {
-      console.log('View', row);
+      if (detailRef.value) {
+        detailRef.value.openDialog(row); // 打开 detail.vue 组件的弹窗
+      } else {
+        console.error('detailRef is not defined');
+      }
     };
 
     const handleCreateTable = (row: any) => {
@@ -237,11 +255,11 @@ export default defineComponent({
       handleView,
       handleCreateTable,
       loadTableData,
+      detailRef, // 返回 detail.vue 组件的引用
     };
   },
 });
 </script>
-
 
 <style scoped>
 .negotiation-container {
