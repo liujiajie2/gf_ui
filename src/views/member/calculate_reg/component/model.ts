@@ -1,29 +1,25 @@
-// model.ts
-
 // 定义表单数据类型
 export interface CalculationForm {
-    serviceName: string;
-    userCode: string;
-    startTime: string;
-    endTime: string;
+    serviceID: string;
+    computeType: string;
+    handleID: string;
+    criteria: {
+        fieldName: string;
+        fieldValue: string;
+    };
+    identifier: {
+        fieldName: string;
+        fieldValue: string;
+    };
 }
 
 // 定义表格展示数据类型
 export interface CalculationTableData {
-    serviceName: string;
-    userCode: string;
-    userName: string; // 新增字段
-    startTime: string;
-    endTime: string;
-    electricityUsage: number; // 新增字段
-}
-
-// 获取默认表单数据
-export function getDefaultCalculationForm(): CalculationForm {
-    return {
-        serviceName: '',
-        userCode: '',
-        startTime: '',
-        endTime: ''
-    };
+    computeTaskID: number;
+    computeType: number;
+    serviceID: number;
+    HandleIDList: string;
+    queryStartTime: string;
+    queryEndTime: string;
+    providerID: number;
 }

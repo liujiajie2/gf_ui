@@ -4,193 +4,362 @@
       <h3>计算页面</h3>
     </div>
 
-    <!-- 上半部分：信息输入 -->
+    <!-- 表单部分 -->
     <el-card shadow="hover">
       <el-form :model="formData" :rules="rules" ref="calculationForm" label-width="120px">
         <el-row>
-          <!-- 服务名 -->
+          <!-- serviceID -->
           <el-col :span="24">
-            <el-form-item label="服务名" prop="serviceName">
-              <el-input v-model="formData.serviceName" placeholder="请输入服务名"></el-input>
+            <el-form-item label="服务ID" prop="serviceID">
+              <el-input v-model="formData.serviceID" placeholder="请输入服务ID"></el-input>
             </el-form-item>
           </el-col>
 
-          <!-- 用户编码 -->
+          <!-- computeType -->
           <el-col :span="24">
-            <el-form-item label="用户编码" prop="userCode">
-              <el-input v-model="formData.userCode" placeholder="请输入用户编码"></el-input>
+            <el-form-item label="计算类型" prop="computeType">
+              <el-input v-model="formData.computeType" placeholder="请输入计算类型"></el-input>
             </el-form-item>
           </el-col>
 
-          <!-- 起始时间 -->
-           
+          <!-- handleID -->
           <el-col :span="24">
-            <el-form-item label="起始时间" prop="startTime">
-              <el-date-picker v-model="formData.startTime" type="datetime" format="YYYY-MM-DD" value-format="YYYY-MM-DD" placeholder="请输入起始时间"></el-date-picker>
-              <!-- <el-input v-model="formData.startTime" placeholder="请输入起始时间"></el-input> -->
-            </el-form-item>
-          </el-col>
-
-          <!-- 终止时间 -->
-          <el-col :span="24">
-            <el-form-item label="终止时间" prop="endTime">
-              <el-date-picker v-model="formData.endTime" type="datetime" format="YYYY-MM-DD" value-format="YYYY-MM-DD" placeholder="请输入终止时间"></el-date-picker>
-
-              <!-- <el-input v-model="formData.endTime" placeholder="请输入终止时间"></el-input> -->
+            <el-form-item label="处理ID" prop="handleID">
+              <el-input v-model="formData.handleID" placeholder="请输入处理ID"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
+          <!-- 计算方式 -->
+          <el-row>
+            <el-col :span="24">
+              <el-form-item label="计算方式">
+                <el-button v-if="!criteriaList.length" @click="addCriteria">新增</el-button>
+                <div v-for="(criteria, index) in criteriaList" :key="index" class="criteria-row">
+                  <el-col :span="24">
+                    <el-form-item label="方式名">
+                      <el-input v-model="criteria.fieldName" placeholder="请输入字段名"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="日期范围">
+                      <el-date-picker
+                        v-model="criteria.fieldValue"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD"
+                      ></el-date-picker>
+                    </el-form-item>
+                  </el-col>
+                </div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        
+          <!-- 标识符 -->
+          <el-row>
+            <el-col :span="24">
+              <el-form-item label="标识符">
+                <el-button v-if="!identifierList.length" @click="addIdentifier">新增</el-button>
+                <div v-for="(identifier, index) in identifierList" :key="index" class="identifier-row">
+                  <el-col :span="24">
+                    <el-form-item label="标识符名">
+                      <el-input v-model="identifier.fieldName" placeholder="请输入字段名"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="标识符值">
+                      <el-input v-model="identifier.fieldValue" placeholder="请输入字段值"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </div>
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-        <!-- 查询和重置按钮 -->
+          <!-- 提交和重置按钮 -->
+          <el-row>
+            <el-col :span="24" class="button-row">
+              <el-button type="primary" @click="submitForm">提交</el-button>
+              <el-button @click="resetForm">重置</el-button>
+            </el-col>
+          </el-row>
+        </el-form>
+      </el-card>
+
+      
+      <!-- 数据展示部分 -->
+      <el-card shadow="hover" class="data-table mt15">
         <el-row>
-          <el-col :span="24" class="button-row">
-            <el-button type="primary" @click="submitForm">查询</el-button>
-            <el-button @click="resetForm">重置</el-button>
+          <!-- 数据请求说明 -->
+          <el-col :span="24">
+            <div class="data-request">数据请求</div>
+          </el-col>
+
+          <!-- 刷新按钮 -->
+          <el-col :span="24" class="refresh-button">
+            <el-button type="primary" @click="loadTableData">刷新数据</el-button>
+          </el-col>
+          
+          <!-- 展示列控制 -->
+          <el-col :span="24" class="column-control">
+            <el-tooltip content="选择展示列" placement="top">
+              <el-dropdown>
+                <el-button link>
+                  <el-icon><ele-Setting /></el-icon> 选择展示列
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-checkbox-group v-model="checkedColumns">
+                      <el-dropdown-item>
+                        <el-checkbox value="computeTaskID">计算任务ID</el-checkbox>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-checkbox value="computeType">计算类型</el-checkbox>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-checkbox value="serviceID">服务ID</el-checkbox>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-checkbox value="HandleIDList">处理ID列表</el-checkbox>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-checkbox value="queryStartTime">查询开始时间</el-checkbox>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-checkbox value="queryEndTime">查询结束时间</el-checkbox>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-checkbox value="providerID">提供者ID</el-checkbox>
+                      </el-dropdown-item>
+                    </el-checkbox-group>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-tooltip>
           </el-col>
         </el-row>
-      </el-form>
-    </el-card>
 
-    <!-- 下半部分：信息展示框 -->
-    <el-card shadow="hover" class="data-table mt15">
-      <el-row>
-        <el-col :span="24">
-          <div class="data-request">数据展示</div>
-        </el-col>
-      </el-row>
-
-      <!-- 列选择控制组件 -->
-      <el-row class="column-control">
-        <el-tooltip content="选择展示列" placement="top">
-          <el-dropdown>
-            <el-button type="text">
-              <el-icon><el-setting /></el-icon> 选择展示列
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-checkbox-group v-model="checkedColumns">
-                  <el-dropdown-item><el-checkbox label="serviceName">服务名</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="userCode">用户编码</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="userName">户名</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="startTime">起始时间</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="endTime">终止时间</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="electricityUsage">用电量</el-checkbox></el-dropdown-item>
-                </el-checkbox-group>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </el-tooltip>
-      </el-row>
-
-      <el-table :data="tableData" stripe>
-        <!-- 列通过选中控制展示 -->
-        <el-table-column v-if="checkedColumns.includes('serviceName')" prop="serviceName" label="服务名" />
-        <el-table-column v-if="checkedColumns.includes('userCode')" prop="userCode" label="用户编码" />
-        <el-table-column v-if="checkedColumns.includes('userName')" prop="userName" label="户名" />
-        <el-table-column v-if="checkedColumns.includes('startTime')" prop="startTime" label="起始时间" />
-        <el-table-column v-if="checkedColumns.includes('endTime')" prop="endTime" label="终止时间" />
-        <el-table-column v-if="checkedColumns.includes('electricityUsage')" prop="electricityUsage" label="用电量" />
-      </el-table>
-    </el-card>
-  </div>
-</template>
+        <el-table :data="dataDisplayState.tableData" stripe>
+          <!-- 通过条件渲染控制列显示 -->
+          <el-table-column v-if="checkedColumns.includes('computeTaskID')" prop="computeTaskID" label="计算任务ID" width="150" />
+          <el-table-column v-if="checkedColumns.includes('computeType')" prop="computeType" label="计算类型" width="200" />
+          <el-table-column v-if="checkedColumns.includes('serviceID')" prop="serviceID" label="服务ID" width="200" />
+          <el-table-column v-if="checkedColumns.includes('HandleIDList')" prop="HandleIDList" label="处理ID列表" width="200" />
+          <el-table-column v-if="checkedColumns.includes('queryStartTime')" prop="queryStartTime" label="查询开始时间" width="200" />
+          <el-table-column v-if="checkedColumns.includes('queryEndTime')" prop="queryEndTime" label="查询结束时间" width="200" />
+          <el-table-column v-if="checkedColumns.includes('providerID')" prop="providerID" label="提供者ID" width="200" />
+        </el-table>
+      </el-card>
+    </div>
+  </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import type { FormInstance } from 'element-plus';
 import { ElMessage } from 'element-plus';
-//import { queryCalculationResult } from "/@/api/member/calculate_reg";
-import type { CalculationForm, CalculationTableData } from './component/model';
+import { CalculationForm, CalculationTableData } from './component/model';
+import { sendRequest,TaskList } from '/@/api/member/calculate_reg';
 
 export default defineComponent({
   name: 'CalculationPage',
   setup() {
     // 表单数据和验证规则
     const formData = ref<CalculationForm>({
-      serviceName: '',
-      userCode: '',
-      startTime: '',
-      endTime: ''
+      serviceID: '',
+      computeType: '',
+      handleID: '',
+      criteria: {
+        fieldName: '',
+        fieldValue: ''
+      },
+      identifier: {
+        fieldName: '',
+        fieldValue: ''
+      }
     });
 
     const rules = {
-      serviceName: [{ required: true, message: '请输入服务名', trigger: 'blur' }],
-      userCode: [{ required: true, message: '请输入用户编码', trigger: 'blur' }],
-      startTime: [{ required: true, message: '请输入起始时间', trigger: 'blur' }],
-      endTime: [{ required: true, message: '请输入终止时间', trigger: 'blur' }]
+      serviceID: [{ required: true, message: '请输入服务ID', trigger: 'blur' }],
+      computeType: [{ required: true, message: '请输入计算类型', trigger: 'blur' }],
+      handleID: [{ required: true, message: '请输入处理ID', trigger: 'blur' }],
+      'criteria.fieldName': [{ required: true, message: '请输入字段名', trigger: 'blur' }],
+      'identifier.fieldName': [{ required: true, message: '请输入字段名', trigger: 'blur' }],
+      'identifier.fieldValue': [{ required: true, message: '请输入字段值', trigger: 'blur' }]
     };
 
-    const calculationForm = ref<FormInstance | null>(null);
-    const tableData = ref<CalculationTableData[]>([]);
-    const checkedColumns = ref<string[]>(['serviceName', 'userCode', 'userName', 'startTime', 'endTime', 'electricityUsage']);
+    const calculationForm = ref();
 
-    // 查询数据
+    // 动态添加的计算方式和标识符列表
+    const criteriaList = ref<{ fieldName: string; fieldValue: [string, string] }[]>([]);
+    const identifierList = ref<{ fieldName: string; fieldValue: string }[]>([]);
+
+    // 数据展示状态
+    const dataDisplayState = ref<{ tableData: CalculationTableData[] }>({
+      tableData: []
+    });
+
+    const checkedColumns = ref<string[]>([
+      'computeTaskID',
+      'computeType',
+      'serviceID',
+      'HandleIDList',
+      'queryStartTime',
+      'queryEndTime',
+      'providerID',
+      'operation',
+    ]);
+
+    // 添加计算方式
+    const addCriteria = () => {
+      criteriaList.value.push({ fieldName: '', fieldValue: ['', ''] });
+    };
+
+    // 添加标识符
+    const addIdentifier = () => {
+      identifierList.value.push({ fieldName: '', fieldValue: '' });
+    };
+
+    // 表单提交函数
     const submitForm = () => {
-      // calculationForm.value?.validate((valid: boolean) => {
-      //   if (valid) {
-      //     queryCalculationResult(formData.value).then((response: { data: CalculationTableData[] }) => {
-      //       tableData.value = response.data;
-      //       ElMessage.success('查询成功');
-      //     }).catch(() => {
-      //       ElMessage.error('查询失败');
-      //     });
-      //   } else {
-      //     ElMessage.error('请完善表单信息');
-      //   }
-      // });
+      calculationForm.value.validate((valid: boolean) => {
+        if (valid) {
+          // 构建请求数据
+          const requestData = {
+            serviceID: formData.value.serviceID,
+            computeType: formData.value.computeType,
+            handleID: formData.value.handleID,
+            criteria: criteriaList.value.map(criteria => ({
+              fieldName: criteria.fieldName,
+              fieldValue: criteria.fieldValue.join(',')
+            })),
+            identifier: identifierList.value.map(identifier => ({
+              fieldName: identifier.fieldName.split(',').map(value => value.trim()),
+              fieldValue: identifier.fieldValue.split(',').map(value => value.trim())
+            }))
+          };
+
+          // 发送请求
+          sendRequest(requestData).then((response: { data: CalculationTableData[] }) => {
+            dataDisplayState.value.tableData = response.data;
+            ElMessage.success('查询成功');
+          }).catch(() => {
+            ElMessage.error('查询失败');
+          });
+        } else {
+          ElMessage.error('请完善表单信息');
+        }
+      });
     };
 
-    // 重置表单
+    // 重置表单函数
     const resetForm = () => {
-      if (calculationForm.value) {
-        calculationForm.value.resetFields();
-      }
+      calculationForm.value.resetFields();
+      criteriaList.value = [];
+      identifierList.value = [];
     };
+
+    const handleEdit = (row: any) => {
+      console.log('Edit', row);
+    };
+
+    const handleView = (row: any) => {
+      console.log('View', row);
+    };
+
+    // 加载表格数据
+    const loadTableData = () => {
+      const query = {
+        user_type: "owner",
+        owner_id: 12,
+      };
+
+      TaskList(query)
+        .then((response) => {
+          console.log('response', response);
+          if (response.data.status === 'success') {
+            ElMessage.success('接收成功');
+            dataDisplayState.value.tableData = response.data.data;
+          } else {
+            ElMessage.error('获取数据失败');
+          }
+        })
+        .catch(() => {
+          ElMessage.error('网络错误，请稍后重试');
+        });
+    };
+
+    // 页面加载时调用加载数据
+    onMounted(() => {
+      loadTableData();
+    });
 
     return {
       formData,
       rules,
       calculationForm,
-      tableData,
+      criteriaList,
+      identifierList,
+      dataDisplayState,
       checkedColumns,
       submitForm,
-      resetForm
+      resetForm,
+      handleEdit,
+      handleView,
+      addCriteria,
+      addIdentifier,
+      loadTableData
     };
-  }
+  },
 });
 </script>
 
 <style scoped>
 .calculation-container {
-  padding: 20px;
+  margin: 20px;
 }
 
-.button-row {
-  text-align: right;
+.form-header {
+  margin-bottom: 20px;
 }
 
 .data-table {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .data-request {
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 10px;
 }
 
 .column-control {
-  text-align: left;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-.el-table th,
-.el-table td {
-  padding: 8px;
-  text-align: center;
+.button-row {
+  margin-top: 10px;
 }
 
-.el-input {
-  width: 100%;
+.button-container {
+  display: flex;
+  gap: 10px; /* 添加按钮间的间距 */
+}
+
+.operation-button {
+  background-color: #007bff; /* 蓝底 */
+  color: white; /* 白字 */
+  border: none; /* 去除边框 */
+}
+
+.operation-button:hover {
+  background-color: #0056b3; /* 鼠标悬停时的颜色变化 */
+}
+
+/* 确保数据列不会换行显示 */
+.el-table-column {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
