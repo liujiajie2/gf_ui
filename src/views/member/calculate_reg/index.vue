@@ -24,8 +24,8 @@
 
           <!-- handleID -->
           <el-col :span="24">
-            <el-form-item label="处理ID" prop="handleID">
-              <el-input v-model="formData.handleID" placeholder="请输入处理ID"></el-input>
+            <el-form-item label="handleID" prop="handleID">
+              <el-input v-model="formData.handleID" placeholder="请输入handleID"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -89,6 +89,14 @@
         </el-form>
       </el-card>
 
+      <!-- 新增的查询按钮和结果显示 -->
+      <el-card shadow="hover" class="mt15">
+        <el-button type="primary" @click="queryResult">查询计算结果</el-button>
+        <div v-if="resultValue" class="result-display">
+          <!-- <p>TaskID: {{ taskID }}</p> -->
+          <p>ResultValue: {{ resultValue }}</p>
+        </div>
+      </el-card>
       
       <!-- 数据展示部分 -->
       <el-card shadow="hover" class="data-table mt15">
@@ -123,7 +131,7 @@
                         <el-checkbox value="serviceID">服务ID</el-checkbox>
                       </el-dropdown-item>
                       <el-dropdown-item>
-                        <el-checkbox value="HandleIDList">处理ID列表</el-checkbox>
+                        <el-checkbox value="HandleIDList">handleID列表</el-checkbox>
                       </el-dropdown-item>
                       <el-dropdown-item>
                         <el-checkbox value="queryStartTime">查询开始时间</el-checkbox>
@@ -161,6 +169,7 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CalculationForm, CalculationTableData } from './component/model';
 import { sendRequest,TaskList } from '/@/api/member/calculate_reg';
+import { ta } from 'element-plus/es/locale';
 
 export default defineComponent({
   name: 'CalculationPage',
@@ -211,6 +220,23 @@ export default defineComponent({
       'operation',
     ]);
 
+
+    // 固定的 TaskID
+    const taskID = ref(BigInt(0));
+    const resultValue = ref('');
+
+    // WebSocket 连接
+    const ws = ref<WebSocket | null>(null);
+    
+    // // 新增的查询表单
+    // const queryForm = ref({
+    //   taskID: 0
+    // });
+
+    // // WebSocket 连接
+    // const ws = ref<WebSocket | null>(null);
+
+
     // 添加计算方式
     const addCriteria = () => {
       criteriaList.value.push({ fieldName: '', fieldValue: ['', ''] });
@@ -243,6 +269,7 @@ export default defineComponent({
           // 发送请求
           sendRequest(requestData).then((response: { data: CalculationTableData[] }) => {
             dataDisplayState.value.tableData = response.data;
+            taskID.value = BigInt(response.data[0].computeTaskID);
             ElMessage.success('查询成功');
           }).catch(() => {
             ElMessage.error('查询失败');
@@ -290,6 +317,47 @@ export default defineComponent({
         });
     };
 
+
+    // 查询计算结果
+    const queryResult = () => {
+      if (!ws.value) {
+        // ws.value = new WebSocket(`ws://localhost:8808/ws?TaskID=${taskID.value}`);
+        ws.value = new WebSocket(`ws://localhost:8808/ws`);
+        
+        ws.value.onopen = () => {
+          ElMessage.success('WebSocket 连接成功');
+        };
+
+        
+        // test 
+        taskID.value = BigInt(1154272151252078612);
+        // taskID.value = BigInt(1154272151200000000);
+        ws.value.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          if (message.TaskID == taskID.value) {
+            resultValue.value = message.ResultValue;
+            ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
+          }
+        };
+
+        ws.value.onclose = () => {
+          ElMessage.info('WebSocket 连接关闭');
+        };
+
+        ws.value.onerror = (error) => {
+          ElMessage.error('WebSocket 错误: ' + error);
+        };
+      }
+
+      if (ws.value.readyState === WebSocket.OPEN) {
+        ws.value.send(JSON.stringify({ taskID: taskID.value }));
+      } else {
+        ElMessage.error('WebSocket 连接未打开');
+      }
+    };
+
+
+
     // 页面加载时调用加载数据
     onMounted(() => {
       loadTableData();
@@ -309,7 +377,10 @@ export default defineComponent({
       handleView,
       addCriteria,
       addIdentifier,
-      loadTableData
+      loadTableData,
+      taskID,
+      resultValue,
+      queryResult
     };
   },
 });
