@@ -1,15 +1,15 @@
 // 定义表单数据类型
 export interface CalculationForm {
-    serviceID: string;
-    computeType: string;
-    handleID: string;
+    serviceID: number;
+    computeType: number;
+    handleID: number;
     criteria: {
         fieldName: string;
         fieldValue: string;
     };
     identifier: {
         fieldName: string;
-        fieldValue: string;
+        fieldValue: string[][];
     };
 }
 
