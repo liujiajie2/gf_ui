@@ -18,6 +18,9 @@
                 <el-dropdown-menu>
                   <el-checkbox-group v-model="checkedColumns">
                     <el-dropdown-item>
+                      <el-checkbox label="negotiation_id">协商ID</el-checkbox>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
                       <el-checkbox label="service_id">服务ID</el-checkbox>
                     </el-dropdown-item>
                     <el-dropdown-item>
@@ -49,6 +52,7 @@
       <div class="table-wrapper">
         <el-table :data="tableData" stripe>
           <!-- 通过条件渲染控制列显示 -->
+          <el-table-column v-if="checkedColumns.includes('negotiation_id')" prop="negotiation_id" label="协商ID" width="120" />
           <el-table-column v-if="checkedColumns.includes('service_id')" prop="service_id" label="服务ID" width="120" />
           <el-table-column v-if="checkedColumns.includes('service_name')" prop="service_name" label="服务名" width="150" />
           <el-table-column v-if="checkedColumns.includes('db_name')" prop="db_name" label="数据库名称" width="200" />
@@ -74,6 +78,9 @@
     <!-- 编辑表单 -->
     <el-card shadow="hover" class="edit-form mt15" v-if="isEditing">
       <el-form :model="editForm" ref="editFormRef" label-width="120px">
+        <el-form-item label="协商ID" prop="negotiation_id">
+          <el-input v-model="editForm.negotiation_id" placeholder="请输入协商ID"></el-input>
+        </el-form-item>
         <el-form-item label="服务ID" prop="service_id">
           <el-input v-model="editForm.service_id" placeholder="请输入服务ID"></el-input>
         </el-form-item>
@@ -141,6 +148,7 @@ export default defineComponent({
   name: 'ProviderPage',
   setup() {
     interface TableData {
+      negotiation_id: string;
       service_id: string;
       service_name: string;
       db_name: string;
@@ -153,6 +161,7 @@ export default defineComponent({
     const tableData = ref<TableData[]>([]);
     const isEditing = ref(false);
     const editForm = ref({
+      negotiation_id: '',
       service_id: '',
       agree: '同意',
       secureTableName: '',
@@ -160,6 +169,7 @@ export default defineComponent({
       reason: ''
     });
     const checkedColumns = ref([
+      'negotiation_id',
       'service_id',
       'service_name',
       'db_name',

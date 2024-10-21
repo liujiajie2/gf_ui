@@ -1,10 +1,13 @@
+export interface FieldContent {
+    databaseName: string;
+    tableName: string;
+}
 export interface NegotiationFormState {
     formData: {
-        databaseName: string;
-        tableName: string;
         serviceName: string;
         providerID: number | null; // 将类型改为 number | null
         serviceOwnerID: number | null;
+        filedContent: FieldContent[];
     };
     rules: {
         [key: string]: any;
@@ -26,15 +29,12 @@ export interface DataDisplayState {
 export function getDefaultNegotiationFormState(): NegotiationFormState {
     return {
         formData: {
-            databaseName: '',
-            tableName: '',
             serviceName: '',
             providerID: null, // 初始化为 null
             serviceOwnerID: null,
+            filedContent: [],
         },
         rules: {
-            databaseName: [{ required: true, message: '请输入数据库名', trigger: 'blur' }],
-            tableName: [{ required: true, message: '请输入数据表名', trigger: 'blur' }],
             serviceName: [{ required: true, message: '请输入服务名', trigger: 'blur' }],
             providerID: [{ required: true, message: '请输入提供方ID', trigger: 'blur' }],
         },

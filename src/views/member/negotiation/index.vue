@@ -8,19 +8,6 @@
       <!-- 表单部分 -->
       <el-form :model="formData" :rules="rules" ref="negotiationForm" label-width="120px">
         <el-row>
-          <!-- 数据库名 -->
-          <el-col :span="24">
-            <el-form-item label="数据库名" prop="databaseName">
-              <el-input v-model="formData.databaseName" placeholder="请输入数据库名"></el-input>
-            </el-form-item>
-          </el-col>
-
-          <!-- 数据表名 -->
-          <el-col :span="24">
-            <el-form-item label="数据表名" prop="tableName">
-              <el-input v-model="formData.tableName" placeholder="请输入数据表名"></el-input>
-            </el-form-item>
-          </el-col>
 
           <!-- 服务名 -->
           <el-col :span="24">
@@ -36,6 +23,18 @@
             </el-form-item>
           </el-col>
         </el-row>
+
+        <div v-for="(field, index) in formData.fieldContent" :key="index" >
+          <el-form-item label="数据库名" prop="databaseName">
+            <el-input v-model="field.databaseName" placeholder="请输入数据库名"></el-input>
+          </el-form-item>
+          
+          <el-form-item label="数据表名" prop="tableName">
+            <el-input v-model="field.tableName" placeholder="请输入数据表名"></el-input>
+          </el-form-item>
+          <el-button type="danger" @click="removeField(index)">删除</el-button>
+        </div>
+        <el-button @click="addField" type="primary" >添加库表</el-button>
 
         <!-- 提交和重置按钮 -->
         <el-row>
@@ -150,7 +149,12 @@ export default defineComponent({
   setup() {
     // 表单状态
     const formState = ref<NegotiationFormState>(getDefaultNegotiationFormState());
-    const formData = formState.value.formData;
+    const formData = ref({
+      serviceName: '',
+      providerID: '',
+      fieldContent: [] as { databaseName: string, tableName: string }[],
+    });
+        
     const rules = formState.value.rules;
     const negotiationForm = ref();
 
@@ -167,6 +171,17 @@ export default defineComponent({
       'operation',
     ]);
 
+    const addField = () => {
+      formData.value.fieldContent.push({
+        databaseName: '',
+        tableName: '',
+      });
+    };
+
+    const removeField = (index: number) => {
+      formData.value.fieldContent.splice(index, 1);
+    };
+
     // 建表按钮处理
     const handleCreateTable = (row: any) => {
       isEditing.value = true;
@@ -178,11 +193,10 @@ export default defineComponent({
       negotiationForm.value.validate((valid: boolean) => {
         if (valid) {
           const dataToSend = {
-            serviceName: formData.serviceName,
-            providerID: formData.providerID,
+            serviceName: formData.value.serviceName,
+            providerID: formData.value.providerID,
             serviceOwnerID: 12,
-            databaseName: formData.databaseName,
-            tableName: formData.tableName,
+            fieldContent: formData.value.fieldContent,
           };
           
           addNegotiation(dataToSend)
@@ -269,6 +283,8 @@ export default defineComponent({
       formData,
       rules,
       negotiationForm,
+      addField,
+      removeField,
       dataDisplayState,
       checkedColumns,
       submitForm,
