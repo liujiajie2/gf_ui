@@ -1,0 +1,15 @@
+version: "3"
+services:
+  frontend:
+    image: frontend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8888:8888"
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
