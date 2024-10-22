@@ -8,7 +8,6 @@
       <!-- 表单部分 -->
       <el-form :model="formData" :rules="rules" ref="negotiationForm" label-width="120px">
         <el-row>
-
           <!-- 服务名 -->
           <el-col :span="24">
             <el-form-item label="服务名" prop="serviceName">
@@ -24,17 +23,24 @@
           </el-col>
         </el-row>
 
-        <div v-for="(field, index) in formData.fieldContent" :key="index" >
-          <el-form-item label="数据库名" prop="databaseName">
-            <el-input v-model="field.databaseName" placeholder="请输入数据库名"></el-input>
-          </el-form-item>
-          
-          <el-form-item label="数据表名" prop="tableName">
-            <el-input v-model="field.tableName" placeholder="请输入数据表名"></el-input>
-          </el-form-item>
-          <el-button type="danger" @click="removeField(index)">删除</el-button>
+        <div v-for="(field, index) in formData.fieldContent" :key="index" class="field-row">
+          <el-row :gutter="20">
+            <el-col :span="10">
+              <el-form-item label="数据库名" :prop="'fieldContent.' + index + '.databaseName'">
+                <el-input v-model="field.databaseName" placeholder="请输入数据库名"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-form-item label="数据表名" :prop="'fieldContent.' + index + '.tableName'">
+                <el-input v-model="field.tableName" placeholder="请输入数据表名"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4" class="delete-button-col">
+              <el-button type="danger" @click="removeField(index)">删除</el-button>
+            </el-col>
+          </el-row>
         </div>
-        <el-button @click="addField" type="primary" >添加库表</el-button>
+        <el-button @click="addField" type="primary">添加库表</el-button>
 
         <!-- 提交和重置按钮 -->
         <el-row>
@@ -111,7 +117,7 @@
             <div class="button-container">
               <el-button type="primary" class="operation-button" @click="handleEdit(scope.row)">编辑</el-button>
               <el-button type="primary" class="operation-button" @click="handleView(scope.row)">查看</el-button>
-              <el-button type="primary" class="action-button" @click="handleCreateTable(scope.row)" v-if = "scope.row.status === 'agree'">建表</el-button>
+              <el-button type="primary" class="action-button" @click="handleCreateTable(scope.row)" v-if="scope.row.status === 'agree'">建表</el-button>
             </div>
           </template>
         </el-table-column>
@@ -348,5 +354,39 @@ export default defineComponent({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 调整输入栏之间的间距 */
+.el-form-item {
+  margin-bottom: 20px; /* 调整输入栏之间的垂直间距 */
+}
+
+.el-col {
+  margin-bottom: 10px; /* 调整列之间的垂直间距 */
+}
+
+.el-row {
+  margin-bottom: 20px; /* 调整行之间的垂直间距 */
+}
+
+.el-form-item:last-child {
+  margin-bottom: 0; /* 最后一个输入栏不需要额外的间距 */
+}
+
+.el-button {
+  margin-top: 10px; /* 调整按钮之间的垂直间距 */
+}
+
+.el-card {
+  margin-bottom: 20px; /* 调整卡片之间的垂直间距 */
+}
+
+.field-row {
+  margin-bottom: 20px; /* 调整每个字段行之间的垂直间距 */
+}
+
+.delete-button-col {
+  display: flex;
+  align-items: flex-end; /* 使删除按钮位于底部 */
 }
 </style>

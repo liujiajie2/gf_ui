@@ -5,7 +5,7 @@ export function sendRequest(params: object) {
     return request({
         url: '/api/v1/system/compute/sendRequest',
         method: 'post',
-        params: params
+        data: params
     })
 }
 

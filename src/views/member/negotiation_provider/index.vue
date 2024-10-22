@@ -1,10 +1,10 @@
 <template>
   <div class="provider-container">
     <div class="form-header">
-      <h3>数据交换请求</h3>
+      <h3>数据协商请求</h3>
     </div>
 
-    <el-card shadow="hover">
+    <el-card shadow="hover" class="data-card">
       <!-- 数据展示部分 -->
       <el-row>
         <el-col :span="24">
@@ -279,6 +279,10 @@ export default defineComponent({
   font-size: 24px;
   color: #303133;
   margin: 0;
+}
+
+.data-card {
+  min-height: 400px; /* 增加卡片的最小高度 */
 }
 
 .el-card {
