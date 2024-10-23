@@ -246,7 +246,7 @@ export default defineComponent({
 
     const submitCreat = async () => {
       try {
-        await axios.post('/api/v1/system/handle/notify', creatTableForm.value);
+        await axios.post(`${import.meta.env.VITE_API_URL}api/v1/system/handle/notify`, creatTableForm.value);
         ElMessage.success('提交成功');
         isEditing.value = false;
       } catch (error) {
