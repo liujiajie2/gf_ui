@@ -142,6 +142,7 @@
 </template>
 
 <script lang="ts">
+import request from '/@/utils/request'
 import { defineComponent, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { NegotiationFormState, getDefaultNegotiationFormState, DataDisplayState, getDefaultDataDisplayState } from '/@/views/member/negotiation/component/model';
@@ -245,7 +246,7 @@ export default defineComponent({
 
     const submitCreat = async () => {
       try {
-        await axios.post('http://localhost:8808/api/v1/system/handle/notify', creatTableForm.value);
+        await axios.post('/api/v1/system/handle/notify', creatTableForm.value);
         ElMessage.success('提交成功');
         isEditing.value = false;
       } catch (error) {
