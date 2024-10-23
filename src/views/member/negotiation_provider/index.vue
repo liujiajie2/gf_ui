@@ -95,28 +95,38 @@
         </el-form-item>
 
         <!-- 新增字段部分 -->
-        <div v-if="editForm.agree === '同意'">
-          <el-form-item v-for="(field, index) in editForm.secureTableField" :key="index">
+        <div  class="addForm" v-if="editForm.agree === '同意'">
+          <el-form-item class="addForm-content" v-for="(field, index) in editForm.secureTableField" :key="index">
             <el-form-item label="字段名" prop="field.fieldName">
-              <el-input v-model="field.fieldName" placeholder="字段名"></el-input>
+              <div class="addForm-input-wrapper">
+                <el-input v-model="field.fieldName" placeholder="字段名"></el-input>
+              </div>
             </el-form-item>
             <el-form-item label="字段类型" prop="field.fieldType">
-              <el-input v-model="field.fieldType" placeholder="字段类型"></el-input>
+              <div class="addForm-input-wrapper">
+                <el-input class="addForm-input" v-model="field.fieldType" placeholder="字段类型"></el-input>
+              </div>
             </el-form-item>
             <el-form-item label="是否为主键" prop="field.isKey">
-              <el-select v-model="field.isKey" label="是否为主键" placeholder="是否为主键">
-                <el-option label="是" value="true"></el-option>
-                <el-option label="否" value="false"></el-option>
-              </el-select>
+              <div class="addForm-input-wrapper">
+                <el-select v-model="field.isKey" label="是否为主键" placeholder="是否为主键">
+                  <el-option label="是" value="true"></el-option>
+                  <el-option label="否" value="false"></el-option>
+                </el-select>
+              </div>
             </el-form-item>
             <el-form-item label="是否脱敏" prop="field.isSecret">
-              <el-select v-model="field.isSecret" placeholder="是否脱敏">
-                <el-option label="是" value="True"></el-option>
-                <el-option label="否" value="False"></el-option>
-              </el-select>
+              <div class="addForm-input-wrapper">
+                <el-select v-model="field.isSecret" placeholder="是否脱敏">
+                  <el-option label="是" value="True"></el-option>
+                  <el-option label="否" value="False"></el-option>
+                </el-select>
+              </div>
             </el-form-item>
             <el-form-item v-if="field.isSecret === 'True'" label="脱敏后字段名" prop="field.fieldNameNew">
-              <el-input v-model="field.fieldNameNew" placeholder="脱敏后字段名"></el-input>
+              <div class="addForm-input-wrapper">
+                <el-input class="addForm-input" v-model="field.fieldNameNew" placeholder="脱敏后字段名"></el-input>
+              </div>
             </el-form-item>
             <el-button type="danger" @click="removeField(index)">删除</el-button>
           </el-form-item>
@@ -261,6 +271,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.addForm-input-wrapper {
+  margin-bottom: 15px;
+}
+
 .provider-container {
   padding: 20px;
   position: relative;
@@ -340,6 +354,7 @@ export default defineComponent({
 .el-button--danger {
   background-color: #f56c6c;
   border-color: #f56c6c;
+  margin-left: 15px;
 }
 
 .el-button--danger:hover {
@@ -370,7 +385,8 @@ export default defineComponent({
 }
 
 .edit-button {
-  position: absolute;
+  position: unset;
+  margin-top: 20px;
   bottom: 20px;
   left: 20px;
   background-color: #409eff;
@@ -498,6 +514,11 @@ export default defineComponent({
 .el-form-item__content .el-textarea {
   width: 200px; /* 调整宽度 */
 }
+
+.el-form-item__content .el-input__wrapper {
+  margin-bottom: 15px;
+}
+
 
 .el-form-item__content .el-input__inner {
   height: 32px; /* 调整高度 */
