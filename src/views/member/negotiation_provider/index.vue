@@ -150,6 +150,7 @@
 </template>
 
 <script lang="ts">
+import request from '/@/utils/request'
 import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
@@ -196,7 +197,7 @@ export default defineComponent({
             user_type: 'provider',
             provider_id: 1234
         };
-        const response = await axios.post('http://localhost:8808/api/v1/system/handle/negotiationList', defaultParams);
+        const response = await axios.post('/api/v1/system/handle/negotiationList', defaultParams);
 
         tableData.value = response.data.data.items;
       } catch (error) {
@@ -219,7 +220,7 @@ export default defineComponent({
     // 提交编辑表单
     const submitEdit = async () => {
       try {
-        await axios.post('http://localhost:8808/api/v1/system/handle/negotiationAgree', editForm.value);
+        await axios.post('/api/v1/system/handle/negotiationAgree', editForm.value);
         ElMessage.success('提交成功');
         isEditing.value = false;
         fetchTableData(); // 重新加载数据
