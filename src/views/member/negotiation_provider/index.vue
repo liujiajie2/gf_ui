@@ -50,7 +50,7 @@
       </el-row>
 
       <div class="table-wrapper">
-        <el-table :data="tableData" stripe>
+        <el-table :data="paginatedTableData" stripe>
           <!-- 通过条件渲染控制列显示 -->
           <el-table-column v-if="checkedColumns.includes('negotiation_id')" prop="negotiation_id" label="协商ID" width="120" />
           <el-table-column v-if="checkedColumns.includes('service_id')" prop="service_id" label="服务ID" width="120" />
@@ -68,6 +68,16 @@
           </el-table-column>
         </el-table>
       </div>
+      <!-- 分页组件 -->
+      <el-pagination
+        class="mt15"
+        background
+        layout="prev, pager, next"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="tableData.length"
+        @current-change="handlePageChange"
+      />
     </el-card>
 
     <!-- 编辑按钮 -->
@@ -150,7 +160,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
@@ -188,6 +198,17 @@ export default defineComponent({
       'remarks',
       'operation'
     ]);
+
+    // 分页相关
+    const currentPage = ref(1);
+    const pageSize = ref(10);
+
+    // 计算分页后的数据
+    const paginatedTableData = computed(() => {
+      const start = (currentPage.value - 1) * pageSize.value;
+      const end = start + pageSize.value;
+      return tableData.value.slice(start, end);
+    });
 
     // 请求数据
     const fetchTableData = async () => {
@@ -249,6 +270,11 @@ export default defineComponent({
       editForm.value.secureTableField.splice(index, 1);
     };
 
+    // 分页处理
+    const handlePageChange = (page: number) => {
+      currentPage.value = page;
+    };
+
     // 初始加载数据
     onMounted(() => {
       fetchTableData();
@@ -264,7 +290,11 @@ export default defineComponent({
       submitEdit,
       cancelEdit,
       addField,
-      removeField
+      removeField,
+      paginatedTableData,
+      currentPage,
+      pageSize,
+      handlePageChange
     };
   }
 });
@@ -527,5 +557,11 @@ export default defineComponent({
 
 .el-form-item__content .el-textarea__inner {
   height: 80px; /* 调整高度 */
+}
+
+/* 分页组件样式 */
+.el-pagination {
+  margin-top: 20px;
+  text-align: center;
 }
 </style>

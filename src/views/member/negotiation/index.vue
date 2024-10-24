@@ -104,7 +104,7 @@
         </el-col>
       </el-row>
 
-      <el-table :data="dataDisplayState.tableData" stripe>
+      <el-table :data="paginatedTableData" stripe>
         <!-- 通过条件渲染控制列显示 -->
         <el-table-column v-if="checkedColumns.includes('service_id')" prop="service_id" label="服务ID" width="150" />
         <el-table-column v-if="checkedColumns.includes('serviceName')" prop="service_name" label="服务名" width="200" />
@@ -122,6 +122,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 分页组件 -->
+      <el-pagination
+        class="mt15"
+        background
+        layout="prev, pager, next"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="dataDisplayState.tableData.length"
+        @current-change="handlePageChange"
+      />
     </el-card>
 
     <!-- 建表表单 -->
@@ -143,7 +153,7 @@
 
 <script lang="ts">
 import request from '/@/utils/request'
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { NegotiationFormState, getDefaultNegotiationFormState, DataDisplayState, getDefaultDataDisplayState } from '/@/views/member/negotiation/component/model';
 import { addNegotiation, listNegotiation } from '/@/api/member/negotiation';
@@ -259,6 +269,18 @@ export default defineComponent({
       isEditing.value = false;
     };
 
+    // 分页相关
+    const currentPage = ref(1);
+    const pageSize = ref(10);
+
+    // 计算分页后的数据
+    const paginatedTableData = computed(() => {
+      const start = (currentPage.value - 1) * pageSize.value;
+      const end = start + pageSize.value;
+      return dataDisplayState.value.tableData.slice(start, end);
+    });
+
+
     // 加载表格数据
     const loadTableData = () => {
       const query = {
@@ -279,6 +301,11 @@ export default defineComponent({
         .catch(() => {
           ElMessage.error('网络错误，请稍后重试');
         });
+    };
+
+    // 分页处理
+    const handlePageChange = (page: number) => {
+      currentPage.value = page;
     };
 
     // 页面加载时调用加载数据
@@ -303,7 +330,11 @@ export default defineComponent({
       submitCreat,
       cancelCreat,
       isEditing,
-      creatTableForm
+      creatTableForm,
+      paginatedTableData,
+      currentPage,
+      pageSize,
+      handlePageChange
     };
   },
 });
@@ -389,5 +420,11 @@ export default defineComponent({
 .delete-button-col {
   display: flex;
   align-items: flex-end; /* 使删除按钮位于底部 */
+}
+
+/* 分页组件样式 */
+.el-pagination {
+  margin-top: 20px;
+  text-align: center;
 }
 </style>
