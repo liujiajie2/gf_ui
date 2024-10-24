@@ -1,102 +1,138 @@
 <template>
-  <el-form ref = "formRef" v-model="formState.formData">
-    <!-- 基本信息部分 -->
-    <el-form-item label="服务名" prop="serviceName">
-      <el-input v-model="formState.formData.serviceName"></el-input>
-    </el-form-item>
-    <el-form-item label="服务ID" prop="serviceID">
-      <el-input type="number" v-model="formState.formData.serviceID"></el-input>
-    </el-form-item>
-    <el-form-item label="句柄名" prop="handleName">
-      <el-input v-model="formState.formData.handleName"></el-input>
-    </el-form-item>
-    <el-form-item label="句柄类型" prop="handleType">
-      <el-input v-model="formState.formData.handleType"></el-input>
-    </el-form-item>
-    <el-form-item label="提供方ID" prop="providerID">
-      <el-input type="number" v-model="formState.formData.providerID"></el-input>
-    </el-form-item>
-    <el-form-item label="数据库名" prop="databaseName">
-      <el-input v-model="formState.formData.databaseName"></el-input>
-    </el-form-item>
-
-    <!-- 键值对内容部分 -->
-    <div v-for="(keyValue, index) in formState.formData.keyValueContent" :key="index" class="key-value-section">
-      <el-form-item label="乱码键值名" prop="keyValueName">
-        <el-input v-model="keyValue.keyValueName"></el-input>
-      </el-form-item>
-      <el-form-item label="原始表名" prop="originalTableName">
-        <el-input v-model="keyValue.originalTableName"></el-input>
-      </el-form-item>
-      <el-form-item label="脱敏表名" prop="secureTableName">
-        <el-input v-model="keyValue.secureTableName"></el-input>
-      </el-form-item>
-      <el-form-item label="字段数量" prop="fieldCount">
-        <el-input type="number" v-model="keyValue.fieldCount" readonly></el-input>
-      </el-form-item>
-
-      <!-- 新增字段内容 -->
-      <div v-for="(field, fieldIndex) in keyValue.fieldContent" :key="fieldIndex" class="field-content-item">
-        <el-form-item label="字段名" prop="fieldName">
-          <el-input v-model="field.fieldName"></el-input>
+  <div class="negotiation-container">
+    <div class="form-header">
+      <h3>服务注册</h3>
+    </div>
+    <el-card>
+      <el-form ref = "formRef" v-model="formState.formData">
+        <!-- 基本信息部分 -->
+        <el-form-item label="服务名" prop="serviceName">
+          <el-input v-model="formState.formData.serviceName"></el-input>
         </el-form-item>
-      </div>
-      <el-button @click="addFieldContent(index)" type="primary" class="add-button">增加字段内容</el-button>
+        <el-form-item label="服务ID" prop="serviceID">
+          <el-input type="number" v-model="formState.formData.serviceID"></el-input>
+        </el-form-item>
+        <el-form-item label="句柄名" prop="handleName">
+          <el-input v-model="formState.formData.handleName"></el-input>
+        </el-form-item>
+        <el-form-item label="句柄类型" prop="handleType">
+          <el-input v-model="formState.formData.handleType"></el-input>
+        </el-form-item>
+        <el-form-item label="提供方ID" prop="providerID">
+          <el-input type="number" v-model="formState.formData.providerID"></el-input>
+        </el-form-item>
+        <el-form-item label="数据库名" prop="databaseName">
+          <el-input v-model="formState.formData.databaseName"></el-input>
+        </el-form-item>
 
-      <!-- 其他信息 -->
-      <el-form-item label="拼接算法动态库名" prop="libName">
-        <el-input v-model="keyValue.libName"></el-input>
-      </el-form-item>
-      <el-form-item label="拼接算法函数名" prop="funcName">
-        <el-input v-model="keyValue.funcName"></el-input>
-      </el-form-item>
-      <el-form-item label="乱码位数" prop="garbleBitCount">
-        <el-input type="number" v-model="keyValue.garbleBitCount"></el-input>
-      </el-form-item>
-      <el-form-item label="乱码覆盖类型" prop="garbleCoverType">
-        <el-input type="number" v-model="keyValue.garbleCoverType"></el-input>
-      </el-form-item>
+        <!-- 键值对内容部分 -->
+        <div v-for="(keyValue, index) in formState.formData.keyValueContent" :key="index" class="key-value-section">
+          <el-form-item label="乱码键值名" prop="keyValueName">
+            <el-input v-model="keyValue.keyValueName"></el-input>
+          </el-form-item>
+          <el-form-item label="原始表名" prop="originalTableName">
+            <el-input v-model="keyValue.originalTableName"></el-input>
+          </el-form-item>
+          <el-form-item label="脱敏表名" prop="secureTableName">
+            <el-input v-model="keyValue.secureTableName"></el-input>
+          </el-form-item>
+          <el-form-item label="字段数量" prop="fieldCount">
+            <el-input type="number" v-model="keyValue.fieldCount" readonly></el-input>
+          </el-form-item>
 
-      <!-- 新增乱码保存字段 -->
-      <el-form-item label="乱码保存字段">
-        <div v-for="(garbleField, garbleIndex) in keyValue.garbleSaveField" :key="garbleIndex" class="garble-save-field-item">
-          <el-form-item label="字段名" prop="fieldName">
-            <el-input v-model="garbleField.fieldName"></el-input>
+          <!-- 新增字段内容 -->
+          <div v-for="(field, fieldIndex) in keyValue.fieldContent" :key="fieldIndex" class="field-content-item">
+            <el-form-item label="字段名" prop="fieldName">
+              <el-input v-model="field.fieldName"></el-input>
+            </el-form-item>
+          </div>
+          <el-button @click="addFieldContent(index)" type="primary" class="add-button">增加字段内容</el-button>
+
+          <!-- 其他信息 -->
+          <el-form-item label="拼接算法动态库名" prop="libName">
+            <div class="addForm-input-wrapper">
+              <el-select v-model="keyValue.libName" placeholder="拼接算法动态库名">
+                <el-option label="libJHTMSticher.so" value="libJHTMSticher.so"></el-option>
+                <el-option label="其他" value="Other"></el-option>
+              </el-select>
+            </div>
           </el-form-item>
-          <el-form-item label="开始字节数" prop="startByte">
-            <el-input type="number" v-model="garbleField.startByte"></el-input>
+          <el-form-item label="拼接算法函数名" prop="funcName">
+            <div class="addForm-input-wrapper">
+              <el-select v-model="keyValue.funcName" placeholder="拼接算法函数名">
+                <el-option label="JHTM_sticher" value="JHTM_sticher"></el-option>
+                <el-option label="其他" value="Other"></el-option>
+              </el-select>
+            </div>
           </el-form-item>
-          <el-form-item label="覆盖字节数" prop="coverByte">
-            <el-input type="number" v-model="garbleField.coverByte"></el-input>
+          <el-form-item label="乱码位数" prop="garbleBitCount">
+            <div class="addForm-input-wrapper">
+              <el-select v-model="keyValue.garbleBitCount" placeholder="乱码位数">
+                <el-option label="8" value="8"></el-option>
+                <el-option label="16" value="16"></el-option>
+                <el-option label="24" value="24"></el-option>
+                <el-option label="32" value="32"></el-option>
+                <el-option label="64" value="64"></el-option>
+              </el-select>
+            </div>
+          </el-form-item>
+          <el-form-item label="乱码覆盖方式" prop="garbleCoverType">
+            <div class="addForm-input-wrapper">
+              <el-select v-model="keyValue.garbleCoverType" placeholder="乱码位数">
+                <el-option label="1: 全覆盖,开始字节数与覆盖字节数默认为0" value="1"></el-option>
+                <el-option label="2: 部分覆盖" value="2"></el-option>
+                <el-option label="3: 拆分覆盖" value="3"></el-option>
+              </el-select>
+            </div>
+          </el-form-item>
+      
+          <!-- 新增乱码保存字段 -->
+          <el-form-item label="乱码保存字段">
+            <div v-for="(garbleField, garbleIndex) in keyValue.garbleSaveField" :key="garbleIndex" class="garble-save-field-item">
+              <el-form-item label="字段名" prop="fieldName">
+                <el-input v-model="garbleField.fieldName"></el-input>
+              </el-form-item>
+              <el-form-item label="开始字节数" prop="startByte">
+                <el-input type="number" v-model="garbleField.startByte"></el-input>
+              </el-form-item>
+              <el-form-item label="覆盖字节数" prop="coverByte">
+                <el-input type="number" v-model="garbleField.coverByte"></el-input>
+              </el-form-item>
+            </div>
+          </el-form-item>
+          
+          <!-- 增加乱码保存字段按钮 -->
+          <el-button @click="addGarbleSaveField(index)" type="primary" class="add-button">增加乱码保存字段</el-button>
+
+          <!-- 乱码算法 -->
+          <el-form-item label="乱码算法" prop="garbleAlgorithm">
+            <div class="addForm-input-wrapper">
+              <el-select v-model="keyValue.garbleAlgorithm" placeholder="乱码算法">
+                <el-option label="SM3" value="SM3"></el-option>
+                <el-option label="其他" value="Other"></el-option>
+              </el-select>
+            </div>
           </el-form-item>
         </div>
-      </el-form-item>
-      
-      <!-- 增加乱码保存字段按钮 -->
-      <el-button @click="addGarbleSaveField(index)" type="primary" class="add-button">增加乱码保存字段</el-button>
 
-      <!-- 乱码算法 -->
-      <el-form-item label="乱码算法" prop="garbleAlgorithm">
-        <el-input v-model="keyValue.garbleAlgorithm"></el-input>
-      </el-form-item>
-    </div>
+        <!-- 增加键值对内容按钮 -->
+        <el-form-item>
+          <el-button @click="addKeyValueContent" type="primary" class="add-button">新增乱码</el-button>
+        </el-form-item>
 
-    <!-- 增加键值对内容按钮 -->
-    <el-form-item>
-      <el-button @click="addKeyValueContent" type="primary" class="add-button">新增乱码</el-button>
-    </el-form-item>
+        <!-- 键值对数量显示框 -->
+        <el-form-item label="乱码数量" prop="keyValueCount">
+          <el-input type="number" v-model="formState.formData.keyValueCount" readonly style="background-color: #f5f5f5; color: #999;"></el-input>
+        </el-form-item>
 
-    <!-- 键值对数量显示框 -->
-    <el-form-item label="乱码数量" prop="keyValueCount">
-      <el-input type="number" v-model="formState.formData.keyValueCount" readonly style="background-color: #f5f5f5; color: #999;"></el-input>
-    </el-form-item>
-
-    <!-- 提交按钮 -->
-    <el-form-item>
-      <el-button type="primary" :loading="formState.loading" @click="submitForm">提交</el-button>
-      <el-button type="warning" class = "custom-reset-button" @click="resetForm">重置</el-button>
-    </el-form-item>
-  </el-form>
+        <!-- 提交按钮 -->
+        <el-form-item>
+          <el-button type="primary" :loading="formState.loading" @click="submitForm">提交</el-button>
+          <el-button type="warning" class = "custom-reset-button" @click="resetForm">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -227,6 +263,37 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
+.negotiation-container {
+  padding: 20px;
+  position: relative;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e4e7ed;
+  padding-bottom: 10px;
+}
+
+.form-header h3 {
+  font-size: 24px;
+  color: #303133;
+  margin: 0;
+}
+
+.el-card {
+  padding-top: 25px;
+  padding-bottom: 25px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.addForm-input-wrapper {
+  width: 100%;
+}
+
 .key-value-section {
   border: 1px dashed #ccc;
   padding: 10px;
