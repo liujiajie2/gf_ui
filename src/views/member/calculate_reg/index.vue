@@ -240,6 +240,17 @@ export default defineComponent({
     // WebSocket 连接
     const ws = ref<WebSocket | null>(null);
 
+<<<<<<< Updated upstream
+=======
+    // 分页相关变量
+    const currentPage = ref(1);
+    const pageSize = ref(5);
+    const total = ref(0);
+
+    // 所有数据
+    const allData = ref<CalculationTableData[]>([]);
+
+>>>>>>> Stashed changes
     // 添加计算方式
     const addCriteria = () => {
       criteriaList.value.push({ fieldName: [], fieldValue: ['', ''] });
