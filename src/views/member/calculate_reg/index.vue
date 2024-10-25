@@ -162,7 +162,7 @@
         </el-col>
       </el-row>
 
-      <el-table :data="dataDisplayState.tableData" stripe>
+      <el-table :data="paginatedTableData" stripe>
         <!-- 通过条件渲染控制列显示 -->
         <el-table-column v-if="checkedColumns.includes('computeTaskID')" prop="computeTaskID" label="计算任务ID" width="150" />
         <el-table-column v-if="checkedColumns.includes('computeType')" prop="computeType" label="计算类型" width="200" />
@@ -173,16 +173,26 @@
         <el-table-column v-if="checkedColumns.includes('queryStartTime')" prop="queryStartTime" label="查询开始时间" width="200" />
         <el-table-column v-if="checkedColumns.includes('queryEndTime')" prop="queryEndTime" label="查询结束时间" width="200" />
       </el-table>
+
+      <!-- 分页组件 -->
+      <el-pagination
+        class="mt15"
+        background
+        layout="prev, pager, next"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="dataDisplayState.tableData.length"
+        @current-change="handlePageChange"
+      />
     </el-card>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CalculationForm, CalculationTableData, ResponseData } from './component/model';
 import { sendRequest, TaskList } from '/@/api/member/calculate_reg';
-import { R } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export default defineComponent({
   name: 'CalculationPage',
@@ -317,6 +327,17 @@ export default defineComponent({
       console.log('View', row);
     };
 
+    // 分页相关
+    const currentPage = ref(1);
+    const pageSize = ref(5);
+
+    // 计算分页后的数据
+    const paginatedTableData = computed(() => {
+      const start = (currentPage.value - 1) * pageSize.value;
+      const end = start + pageSize.value;
+      return dataDisplayState.value.tableData.slice(start, end);
+    });
+
     // 加载表格数据
     const loadTableData = () => {
       const query = {
@@ -336,6 +357,11 @@ export default defineComponent({
         .catch(() => {
           ElMessage.error('网络错误，请稍后重试');
         });
+    };
+
+    // 分页处理
+    const handlePageChange = (page: number) => {
+      currentPage.value = page;
     };
 
     // 查询计算结果
@@ -398,7 +424,11 @@ export default defineComponent({
       loadTableData,
       taskID,
       resultValue,
-      queryResult
+      queryResult,
+      paginatedTableData,
+      currentPage,
+      pageSize,
+      handlePageChange
     };
   },
 });
