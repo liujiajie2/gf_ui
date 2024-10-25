@@ -237,6 +237,7 @@ export default defineComponent({
       'computeType',
       'serviceID',
       'HandleIDList',
+      'status',
       'queryStartTime',
       'queryEndTime',
       'providerID',
