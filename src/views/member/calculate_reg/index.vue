@@ -117,7 +117,7 @@
 
         <!-- 刷新按钮 -->
         <el-col :span="24" class="refresh-button">
-          <el-button type="primary" @click="loadAllData">刷新数据</el-button>
+          <el-button type="primary" @click="loadTableData">刷新数据</el-button>
         </el-col>
 
         <!-- 展示列控制 -->
@@ -140,16 +140,19 @@
                       <el-checkbox value="serviceID">服务ID</el-checkbox>
                     </el-dropdown-item>
                     <el-dropdown-item>
+                      <el-checkbox value="providerID">提供者ID</el-checkbox>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
                       <el-checkbox value="HandleIDList">handleID列表</el-checkbox>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-checkbox value="status">计算状态</el-checkbox>
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-checkbox value="queryStartTime">查询开始时间</el-checkbox>
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-checkbox value="queryEndTime">查询结束时间</el-checkbox>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-checkbox value="providerID">提供者ID</el-checkbox>
                     </el-dropdown-item>
                   </el-checkbox-group>
                 </el-dropdown-menu>
@@ -164,31 +167,22 @@
         <el-table-column v-if="checkedColumns.includes('computeTaskID')" prop="computeTaskID" label="计算任务ID" width="150" />
         <el-table-column v-if="checkedColumns.includes('computeType')" prop="computeType" label="计算类型" width="200" />
         <el-table-column v-if="checkedColumns.includes('serviceID')" prop="serviceID" label="服务ID" width="200" />
+        <el-table-column v-if="checkedColumns.includes('providerID')" prop="providerID" label="提供者ID" width="200" />
         <el-table-column v-if="checkedColumns.includes('HandleIDList')" prop="HandleIDList" label="处理ID列表" width="200" />
+        <el-table-column v-if="checkedColumns.includes('status')" prop="status" label="任务状态" width="200" />
         <el-table-column v-if="checkedColumns.includes('queryStartTime')" prop="queryStartTime" label="查询开始时间" width="200" />
         <el-table-column v-if="checkedColumns.includes('queryEndTime')" prop="queryEndTime" label="查询结束时间" width="200" />
-        <el-table-column v-if="checkedColumns.includes('providerID')" prop="providerID" label="提供者ID" width="200" />
       </el-table>
-
-      <!-- 分页组件 -->
-      <el-pagination
-        class="mt15"
-        background
-        layout="prev, pager, next"
-        :current-page="currentPage"
-        :page-size="pageSize"
-        :total="total"
-        @current-change="handlePageChange"
-      ></el-pagination>
     </el-card>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onActivated } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { CalculationForm, CalculationTableData } from './component/model';
+import { CalculationForm, CalculationTableData, ResponseData } from './component/model';
 import { sendRequest, TaskList } from '/@/api/member/calculate_reg';
+import { R } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export default defineComponent({
   name: 'CalculationPage',
@@ -246,14 +240,6 @@ export default defineComponent({
     // WebSocket 连接
     const ws = ref<WebSocket | null>(null);
 
-    // 分页相关变量
-    const currentPage = ref(1);
-    const pageSize = ref(10);
-    const total = ref(0);
-
-    // 所有数据
-    const allData = ref<CalculationTableData[]>([]);
-
     // 添加计算方式
     const addCriteria = () => {
       criteriaList.value.push({ fieldName: [], fieldValue: ['', ''] });
@@ -291,13 +277,17 @@ export default defineComponent({
 
           // 发送请求
           console.log('Request Data:', requestData);
-          sendRequest(requestData).then((response: { data: CalculationTableData[] }) => {
-            console.log('data:', response.data);
+          sendRequest(requestData).then((response: { data: ResponseData }) => {
             console.log('Response Data:', response);
-            dataDisplayState.value.tableData = response.data;
-            taskID.value = BigInt(response.data[0].computeTaskID);
+            loadTableData();          // 刷新展示数据
+            // dataDisplayState.value.tableData = response.data;
+            // console.log('taskID:', response.data.taskID)
+            taskID.value = BigInt(response.data.taskID);
             ElMessage.success('查询成功');
-          })
+          }).catch((error) => {
+            console.error('Error:', error);
+            ElMessage.error('查询失败');
+          });
         } else {
           ElMessage.error('请完善表单信息');
         }
@@ -319,8 +309,8 @@ export default defineComponent({
       console.log('View', row);
     };
 
-    // 加载所有数据
-    const loadAllData = () => {
+    // 加载表格数据
+    const loadTableData = () => {
       const query = {
         user_type: "owner",
         owner_id: 12,
@@ -329,10 +319,8 @@ export default defineComponent({
       TaskList(query)
         .then((response) => {
           if (response.data.status === 'success') {
-            allData.value = response.data.data;
-            total.value = allData.value.length;
-            //currentPage.value = 1 ; // 重置页码为1
-            loadTableData(currentPage.value); // 初始加载第一页数据
+            ElMessage.success('接收成功');
+            dataDisplayState.value.tableData = response.data.data;
           } else {
             ElMessage.error('获取数据失败');
           }
@@ -342,62 +330,46 @@ export default defineComponent({
         });
     };
 
-    // 加载表格数据
-    const loadTableData = (page = 1) => {
-      const start = (page - 1) * pageSize.value;
-      const end = start + pageSize.value;
-      dataDisplayState.value.tableData = allData.value.slice(start, end);
-    };
-
     // 查询计算结果
     const queryResult = () => {
-      if (!ws.value) {
-        ws.value = new WebSocket(`ws://localhost:8808/ws`);
-
-        ws.value.onopen = () => {
-          ElMessage.success('WebSocket 连接成功');
-        };
-
-        taskID.value = BigInt(1154272151252078612);
-        ws.value.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          if (message.TaskID == taskID.value) {
-            resultValue.value = message.ResultValue;
-            ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
-          }
-        };
-
-        ws.value.onclose = () => {
-          ElMessage.info('WebSocket 连接关闭');
-        };
-
-        ws.value.onerror = (error) => {
-          ElMessage.error('WebSocket 错误: ' + error);
-        };
-      }
-
-      if (ws.value.readyState === WebSocket.OPEN) {
-        ws.value.send(JSON.stringify({ taskID: taskID.value }));
+      if (taskID.value == BigInt(0)) {
+          ElMessage.error('请先提交查询表单');
       } else {
-        ElMessage.error('WebSocket 连接未打开');
-      }
-    };
+        if (!ws.value) {
+          ws.value = new WebSocket(`ws://localhost:8808/ws`);
 
-    // 处理分页变化
-    const handlePageChange = (page: number) => {
-      currentPage.value = page;
-      loadTableData(page);
+          ws.value.onopen = () => {
+            ElMessage.success('WebSocket 连接成功');
+          };
+          
+          ws.value.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.TaskID == taskID.value) {
+              resultValue.value = message.ResultValue;
+              ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
+            }
+          };
+
+          ws.value.onclose = () => {
+            ElMessage.info('WebSocket 连接关闭');
+          };
+
+          ws.value.onerror = (error) => {
+            ElMessage.error('WebSocket 错误: ' + error);
+          };
+        }
+
+        // if (ws.value.readyState == WebSocket.OPEN) {
+        //   ws.value.send(JSON.stringify({ taskID: taskID.value }));
+        // } else {
+        //   ElMessage.error('WebSocket 连接未打开');
+        // }
+      }
     };
 
     // 页面加载时调用加载数据
     onMounted(() => {
-      loadAllData();
-      //setInterval(() => loadAllData(), 5000); // 每5秒自动刷新一次
-    });
-
-    // 页面激活时调用加载数据
-    onActivated(() => {
-      loadAllData();
+      loadTableData();
     });
 
     return {
@@ -415,14 +387,10 @@ export default defineComponent({
       addCriteria,
       addIdentifier,
       addIdentifierValue,
-      loadAllData,
+      loadTableData,
       taskID,
       resultValue,
-      queryResult,
-      currentPage,
-      pageSize,
-      total,
-      handlePageChange
+      queryResult
     };
   },
 });
@@ -474,30 +442,5 @@ export default defineComponent({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* 调整输入栏之间的间距 */
-.el-form-item {
-  margin-bottom: 20px; /* 调整输入栏之间的垂直间距 */
-}
-
-.el-col {
-  margin-bottom: 10px; /* 调整列之间的垂直间距 */
-}
-
-.el-row {
-  margin-bottom: 20px; /* 调整行之间的垂直间距 */
-}
-
-.el-form-item:last-child {
-  margin-bottom: 0; /* 最后一个输入栏不需要额外的间距 */
-}
-
-.el-button {
-  margin-top: 10px; /* 调整按钮之间的垂直间距 */
-}
-
-.el-card {
-  margin-bottom: 20px; /* 调整卡片之间的垂直间距 */
 }
 </style>
