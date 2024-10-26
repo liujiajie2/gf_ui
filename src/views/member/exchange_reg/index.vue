@@ -14,6 +14,12 @@
               <el-input v-model="formData.serviceID" placeholder="请输入服务ID"></el-input>
             </el-form-item>
           </el-col>
+          <!-- handleID -->
+          <el-col :span="24">
+            <el-form-item label="Handle ID" prop="handleID">
+              <el-input v-model="formData.handleID" placeholder="请输入HandID"></el-input>
+            </el-form-item>
+          </el-col>
         </el-row>
         <!-- 提交和重置按钮 -->
         <el-row>

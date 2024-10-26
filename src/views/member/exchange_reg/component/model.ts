@@ -1,6 +1,7 @@
 // 定义表单数据结构
 export interface ExchangeForm {
     serviceID: number;   // 服务ID
+    handleID: number;    // handleID
 }
 
 // 定义表格数据结构
@@ -15,5 +16,6 @@ export interface ExchangeTableData {
 export function getDefaultExchangeForm(): ExchangeForm {
     return {
         serviceID: 0,
+        handleID: 0
     };
 }
