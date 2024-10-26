@@ -193,6 +193,8 @@ import { defineComponent, ref, onMounted, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CalculationForm, CalculationTableData, ResponseData } from './component/model';
 import { sendRequest, TaskList } from '/@/api/member/calculate_reg';
+import { Console } from 'console';
+import { number } from 'echarts';
 
 export default defineComponent({
   name: 'CalculationPage',
@@ -245,7 +247,7 @@ export default defineComponent({
     ]);
 
     // 固定的 TaskID
-    const taskID = ref(BigInt(0));
+    const taskID = ref((0));
     const resultValue = ref('');
 
     // WebSocket 连接
@@ -293,7 +295,9 @@ export default defineComponent({
             loadTableData();          // 刷新展示数据
             // dataDisplayState.value.tableData = response.data;
             // console.log('taskID:', response.data.taskID)
-            taskID.value = BigInt(response.data.taskID);
+            taskID.value = response.data.taskID;
+            console.log('taskID:', taskID.value)
+            console.log('ResultValue:', response.data.taskID)
             ElMessage.success('查询成功');
           }).catch((error) => {
             console.error('Error:', error);
@@ -359,32 +363,36 @@ export default defineComponent({
 
     // 查询计算结果
     const queryResult = () => {
-      if (taskID.value == BigInt(0)) {
+      if (taskID.value == 0) {
           ElMessage.error('请先提交查询表单');
       } else {
+        // 如果没有连接，新建 WebSocket 连接
         if (!ws.value) {
           ws.value = new WebSocket(`ws://localhost:8808/ws`);
 
           ws.value.onopen = () => {
             ElMessage.success('WebSocket 连接成功');
           };
-          
-          ws.value.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            if (message.TaskID == taskID.value) {
-              resultValue.value = message.ResultValue;
-              ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
-            }
-          };
+        };
+        ElMessage.info('正在等待结果...');
+        ws.value.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          console.log('TaskID: ' + message.TaskID + ', taskID.value: ' + taskID.value);
+          if (message.TaskID == taskID.value) {
+            resultValue.value = message.ResultValue;
+            ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
+          }
+          resultValue.value = message.ResultValue;
+          ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
+        };
 
-          ws.value.onclose = () => {
-            ElMessage.info('WebSocket 连接关闭');
-          };
+        ws.value.onclose = () => {
+          ElMessage.info('WebSocket 连接关闭');
+        };
 
-          ws.value.onerror = (error) => {
-            ElMessage.error('WebSocket 错误: ' + error);
-          };
-        }
+        ws.value.onerror = (error) => {
+          ElMessage.error('WebSocket 错误: ' + error);
+        };
 
         // if (ws.value.readyState == WebSocket.OPEN) {
         //   ws.value.send(JSON.stringify({ taskID: taskID.value }));
