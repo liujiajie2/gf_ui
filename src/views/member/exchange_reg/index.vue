@@ -29,7 +29,7 @@
     <el-card shadow="hover" class="data-table mt15">
       <el-row>
         <el-col :span="24">
-          <div class="data-request">数据展示</div>
+          <div class="data-request">Handle 列表</div>
         </el-col>
       </el-row>
 
@@ -54,19 +54,29 @@
         </el-tooltip>
       </el-row>
 
-      <el-table :data="tableData" stripe>
+      <el-table :data="paginatedTableData" stripe>
         <!-- 列通过选中控制展示 -->
         <el-table-column v-if="checkedColumns.includes('serviceName')" prop="service_name" label="服务名" />
         <el-table-column v-if="checkedColumns.includes('providerName')" prop="provider_id" label="提供方ID" />
         <el-table-column v-if="checkedColumns.includes('serviceID')" prop="service_id" label="服务ID" />
         <el-table-column v-if="checkedColumns.includes('handleID')" prop="handle_id" label="Handle ID" />
       </el-table>
+      <!-- 分页组件 -->
+      <el-pagination
+        class="mt15"
+        background
+        layout="prev, pager, next"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="tableData.length"
+        @current-change="handlePageChange"
+      />
     </el-card>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed} from 'vue';
 import type { FormInstance } from 'element-plus';
 import { ElMessage } from 'element-plus';
 import { submitExchangeData, listHandle } from "/@/api/member/exchange_reg";
@@ -116,11 +126,28 @@ export default defineComponent({
         user_type: "owner",
         owner_id: 12,
       }
-        listHandle(query ).then((response: { data: ExchangeTableData[] }) => {
-        tableData.value = response.data;
+        listHandle(query ).then((response) => {
+        tableData.value = response.data.items;
+        console.log(response.data);
       }).catch(() => {
         //ElMessage.error('获取数据失败');
       });
+    };
+
+    // 分页相关
+    const currentPage = ref(1);
+    const pageSize = ref(10);
+
+    // 计算分页后的数据
+    const paginatedTableData = computed(() => {
+      const start = (currentPage.value - 1) * pageSize.value;
+      const end = start + pageSize.value;
+      return tableData.value.slice(start, end);
+    });
+
+    // 分页处理
+    const handlePageChange = (page: number) => {
+      currentPage.value = page;
     };
 
     onMounted(() => {
@@ -135,6 +162,10 @@ export default defineComponent({
       checkedColumns,
       submitForm,
       resetForm,
+      handlePageChange,
+      paginatedTableData,
+      currentPage,
+      pageSize,
     };
   }
 });
