@@ -210,4 +210,37 @@ export default defineComponent({
 .el-input {
   width: 100%;
 }
+
+
+/* 调整输入栏之间的间距 */
+.el-form-item {
+  margin-bottom: 20px; /* 调整输入栏之间的垂直间距 */
+}
+
+.el-col {
+  margin-bottom: 10px; /* 调整列之间的垂直间距 */
+}
+
+.el-row {
+  margin-bottom: 20px; /* 调整行之间的垂直间距 */
+}
+
+.el-form-item:last-child {
+  margin-bottom: 0; /* 最后一个输入栏不需要额外的间距 */
+}
+
+.el-button {
+  margin-top: 10px; /* 调整按钮之间的垂直间距 */
+}
+
+.el-card {
+  margin-bottom: 20px; /* 调整卡片之间的垂直间距 */
+}
+
+/* 分页组件样式 */
+.el-pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
 </style>
