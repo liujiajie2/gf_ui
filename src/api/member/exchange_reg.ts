@@ -10,9 +10,10 @@ export function submitExchangeData(data: object) {
 }
 
 // 获取展示列信息
-export function getExchangeTableData() {
+export function listHandle(query: object) {
     return request({
-        url: '/api/v1/system/exchange/sendExchangeRequest',  // 替换为实际后端接口
+        url: '/api/v1/system/exchange/listHandle',  // 替换为实际后端接口
         method: 'post',
+        data: query
     });
 }

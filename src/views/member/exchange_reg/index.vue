@@ -44,9 +44,9 @@
               <el-dropdown-menu>
                 <el-checkbox-group v-model="checkedColumns">
                   <el-dropdown-item><el-checkbox label="serviceName">服务名</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="providerName">提供方名</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="tableName">数据表名</el-checkbox></el-dropdown-item>
-                  <el-dropdown-item><el-checkbox label="exchangeResult">交换结果</el-checkbox></el-dropdown-item>
+                  <el-dropdown-item><el-checkbox label="providerName">提供方ID</el-checkbox></el-dropdown-item>
+                  <el-dropdown-item><el-checkbox label="serviceID">服务ID</el-checkbox></el-dropdown-item>
+                  <el-dropdown-item><el-checkbox label="handleID">Handle ID</el-checkbox></el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
             </template>
@@ -56,10 +56,10 @@
 
       <el-table :data="tableData" stripe>
         <!-- 列通过选中控制展示 -->
-        <el-table-column v-if="checkedColumns.includes('serviceName')" prop="serviceName" label="服务名" />
-        <el-table-column v-if="checkedColumns.includes('providerName')" prop="providerName" label="提供方名" />
-        <el-table-column v-if="checkedColumns.includes('tableName')" prop="tableName" label="数据表名" />
-        <el-table-column v-if="checkedColumns.includes('exchangeResult')" prop="exchangeResult" label="交换结果" />
+        <el-table-column v-if="checkedColumns.includes('serviceName')" prop="service_name" label="服务名" />
+        <el-table-column v-if="checkedColumns.includes('providerName')" prop="provider_id" label="提供方ID" />
+        <el-table-column v-if="checkedColumns.includes('serviceID')" prop="service_id" label="服务ID" />
+        <el-table-column v-if="checkedColumns.includes('handleID')" prop="handle_id" label="Handle ID" />
       </el-table>
     </el-card>
   </div>
@@ -69,7 +69,7 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { ElMessage } from 'element-plus';
-import { submitExchangeData, getExchangeTableData } from "/@/api/member/exchange_reg";
+import { submitExchangeData, listHandle } from "/@/api/member/exchange_reg";
 import { ExchangeForm, getDefaultExchangeForm, ExchangeTableData } from './component/model';
 
 export default defineComponent({
@@ -84,7 +84,7 @@ export default defineComponent({
 
     const exchangeForm = ref<FormInstance | null>(null);
     const tableData = ref<ExchangeTableData[]>([]);
-    const checkedColumns = ref<string[]>(['serviceName', 'providerName', 'tableName', 'exchangeResult']);
+    const checkedColumns = ref<string[]>(['serviceName', 'providerName', 'serviceID', 'handleID']);
 
     // 提交表单
     const submitForm = () => {
@@ -112,7 +112,11 @@ export default defineComponent({
 
     // 获取展示列数据
     const fetchTableData = () => {
-      getExchangeTableData().then((response: { data: ExchangeTableData[] }) => {
+      const query = {
+        user_type: "owner",
+        owner_id: 12,
+      }
+        listHandle(query ).then((response: { data: ExchangeTableData[] }) => {
         tableData.value = response.data;
       }).catch(() => {
         //ElMessage.error('获取数据失败');
