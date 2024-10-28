@@ -368,8 +368,8 @@ export default defineComponent({
       } else {
         // 如果没有连接，新建 WebSocket 连接
         if (!ws.value) {
-          ws.value = new WebSocket(`ws://localhost:8808/ws`);
-
+          console.log('VITE_WS_URL:', import.meta.env.VITE_WS_URL);
+          ws.value = new WebSocket(import.meta.env.VITE_WS_URL);
           ws.value.onopen = () => {
             ElMessage.success('WebSocket 连接成功');
           };
@@ -382,8 +382,8 @@ export default defineComponent({
             resultValue.value = message.ResultValue;
             ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
           }
-          resultValue.value = message.ResultValue;
-          ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
+          // resultValue.value = message.ResultValue;
+          // ElMessage.success(`TaskID: ${message.TaskID}, ResultValue: ${message.ResultValue}`);
         };
 
         ws.value.onclose = () => {
