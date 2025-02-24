@@ -24,8 +24,8 @@
 
           <!-- handleID -->
           <el-col :span="24">
-            <el-form-item label="handleID" prop="handleID">
-              <el-input v-model="formData.handleID" placeholder="请输入handleID"></el-input>
+            <el-form-item label="handle_name" prop="handle_name">
+              <el-input v-model="formData.handle_name" placeholder="请输入句柄号"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -203,7 +203,7 @@ export default defineComponent({
     const formData = ref<CalculationForm>({
       serviceID: 0,
       computeType: 0,
-      handleID: 0,
+      handle_name: 0,
       criteria: {
         fieldName: '',
         fieldValue: ''
@@ -277,7 +277,7 @@ export default defineComponent({
           const requestData: CalculationForm = {
             serviceID: Number(formData.value.serviceID),
             computeType: Number(formData.value.computeType),
-            handleID: Number(formData.value.handleID),
+            handle_name: Number(formData.value.handle_name),
             criteria: {
               fieldName: criteriaList.value[0].fieldName.join(','),
               fieldValue: criteriaList.value[0].fieldValue.join(',')

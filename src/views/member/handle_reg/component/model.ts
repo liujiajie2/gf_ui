@@ -2,7 +2,10 @@ import { reactive } from 'vue';
 
 export interface KeyValueContent {
     keyValueName: string;
-    originalTableName: string;
+    originTableName: string;
+    originFieldName: string[];
+    originFieldInputVisible: boolean;
+    originFieldInputValue: string;
     secureTableName: string;
     fieldCount: number;
     fieldContent: FieldContent[];
@@ -12,6 +15,12 @@ export interface KeyValueContent {
     garbleCoverType: number;
     garbleSaveField: GarbleSaveField[];
     garbleAlgorithm: string;
+    format: string;
+    desenTableName: string;
+    desenFieldName: string[];
+    desenFieldInputVisible: boolean;
+    desenFieldInputValue: string;
+    protocol: number;
 }
 
 export interface FieldContent {
@@ -76,7 +85,7 @@ function validateKeyValueContent(rule: any, value: KeyValueContent[], callback: 
         callback(new Error('请添加键值对内容'));
     } else {
         for (const item of value) {
-            if (!item.keyValueName || !item.originalTableName || !item.secureTableName) {
+            if (!item.keyValueName || !item.originTableName || !item.secureTableName) {
                 callback(new Error('键值对内容的必填字段不能为空'));
                 return;
             }

@@ -30,10 +30,7 @@
           <el-form-item label="乱码键值名" prop="keyValueName">
             <el-input v-model="keyValue.keyValueName"></el-input>
           </el-form-item>
-          <el-form-item label="原始表名" prop="originalTableName">
-            <el-input v-model="keyValue.originalTableName"></el-input>
-          </el-form-item>
-          <el-form-item label="脱敏表名" prop="secureTableName">
+          <el-form-item label="安全存储表名" prop="secureTableName">
             <el-input v-model="keyValue.secureTableName"></el-input>
           </el-form-item>
           <el-form-item label="字段数量" prop="fieldCount">
@@ -113,6 +110,94 @@
               </el-select>
             </div>
           </el-form-item>
+
+          <el-form-item label="原始表名" prop="originTableName">
+            <el-input v-model="keyValue.originTableName"></el-input>
+          </el-form-item>
+
+          <!-- 原始表中字段内容 -->
+          <el-form-item label="原始表中字段内容" prop="originFieldName">
+            <div class="origin-field-tags">
+              <!-- 显示已输入的标签 -->
+              <el-tag
+                v-for="(field, fieldIndex) in keyValue.originFieldName"
+                :key="fieldIndex"
+                closable
+                @close="removeOriginField(index, fieldIndex)">
+                {{ field }}
+              </el-tag>
+              
+              <!-- 动态输入框 -->
+              <el-input
+                v-if="keyValue.originFieldInputVisible"
+                v-model="keyValue.originFieldInputValue"
+                class="input-new-tag"
+                size="small"
+                @keyup.enter="addOriginField(index)"
+                @blur="addOriginField(index)"
+              />
+              
+              <!-- 显示新增按钮 -->
+              <el-button
+                v-else
+                class="button-new-tag"
+                size="small"
+                @click="showOriginFieldInput(index)">
+                + 新增字段
+              </el-button>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="原始表对应脱敏表名" prop="desenTableName">
+            <el-input v-model="keyValue.desenTableName"></el-input>
+          </el-form-item>
+
+          <!-- 原始表中字段内容 -->
+          <el-form-item label="脱敏表中字段内容" prop="desenFieldName">
+            <div class="desen-field-tags">
+              <!-- 显示已输入的标签 -->
+              <el-tag
+                v-for="(field, fieldIndex) in keyValue.desenFieldName"
+                :key="fieldIndex"
+                closable
+                @close="removeDesenField(index, fieldIndex)">
+                {{ field }}
+              </el-tag>
+              
+              <!-- 动态输入框 -->
+              <el-input
+                v-if="keyValue.desenFieldInputVisible"
+                v-model="keyValue.desenFieldInputValue"
+                class="input-new-tag"
+                size="small"
+                @keyup.enter="addDesenField(index)"
+                @blur="addDesenField(index)"
+              />
+              
+              <!-- 显示新增按钮 -->
+              <el-button
+                v-else
+                class="button-new-tag"
+                size="small"
+                @click="showDesenFieldInput(index)">
+                + 新增字段
+              </el-button>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="数据交换格式" prop="format">
+            <el-input v-model="keyValue.format"></el-input>
+          </el-form-item>
+
+          <el-form-item label="数据交换协议" prop="protocol">
+            <div class="addForm-input-wrapper">
+              <el-select v-model="keyValue.protocol" placeholder="数据交换协议">
+                <el-option label="1: 内部安全协议" value="1"></el-option>
+                <el-option label="2: HTTP协议" value="2"></el-option>
+              </el-select>
+            </div>
+          </el-form-item>
+
         </div>
 
         <!-- 增加键值对内容按钮 -->
@@ -139,7 +224,7 @@
 import { defineComponent, reactive, ref ,onMounted,nextTick} from 'vue';
 import { RegistrationFormState, getDefaultFormState } from '/@/views/member/handle_reg/component/model';
 import { registerHandleInfo} from '/@/api/member/handle_reg';
-import { ElForm } from 'element-plus';
+import { ElForm, ElInput } from 'element-plus';
 
 //const formRef = ref(null);
 
@@ -160,7 +245,7 @@ export default defineComponent({
     const addKeyValueContent = () => {
       formState.formData.keyValueContent.push({
         keyValueName: '',
-        originalTableName: '',
+        originTableName: '',
         secureTableName: '',
         fieldCount: 0,
         fieldContent: [],
@@ -169,10 +254,44 @@ export default defineComponent({
         garbleBitCount: 0,
         garbleCoverType: 0,
         garbleSaveField: [],
-        garbleAlgorithm: ''
+        garbleAlgorithm: '',
+        format: 'JSON',
+        originFieldName: [],
+        originFieldInputVisible: false, // 新增输入框显示状态
+        originFieldInputValue: '', // 新增输入框的值
+        desenTableName: '',
+        desenFieldName: [],
+        protocol: 2,
+        desenFieldInputVisible: false,
+        desenFieldInputValue: ''
       });
       // Update keyValueCount
       formState.formData.keyValueCount = formState.formData.keyValueContent.length;
+    };
+
+    const showOriginFieldInput = (keyValueIndex: number) => {
+      formState.formData.keyValueContent[keyValueIndex].originFieldInputVisible = true;
+      // 自动聚焦输入框（需要确保ref正确）
+      nextTick(() => {
+      // 使用类型断言 `as HTMLInputElement`
+        const inputRef = document.querySelector('.input-new-tag') as HTMLInputElement;
+        if (inputRef) {
+          inputRef.focus();
+        }
+      });
+    };
+
+    const addOriginField = (keyValueIndex: number) => {
+      const inputValue = formState.formData.keyValueContent[keyValueIndex].originFieldInputValue.trim();
+      if (inputValue) {
+        formState.formData.keyValueContent[keyValueIndex].originFieldName.push(inputValue);
+        formState.formData.keyValueContent[keyValueIndex].originFieldInputValue = '';
+      }
+      formState.formData.keyValueContent[keyValueIndex].originFieldInputVisible = false;
+    };
+
+    const removeOriginField = (keyValueIndex: number, fieldIndex: number) => {
+      formState.formData.keyValueContent[keyValueIndex].originFieldName.splice(fieldIndex, 1);
     };
 
     const addFieldContent = (index: number) => {
@@ -181,6 +300,31 @@ export default defineComponent({
       });
       // Update fieldCount
       formState.formData.keyValueContent[index].fieldCount = formState.formData.keyValueContent[index].fieldContent.length;
+    };
+
+    const showDesenFieldInput = (keyValueIndex: number) => {
+      formState.formData.keyValueContent[keyValueIndex].desenFieldInputVisible = true;
+      // 自动聚焦输入框（需要确保ref正确）
+      nextTick(() => {
+      // 使用类型断言 `as HTMLInputElement`
+        const inputRef = document.querySelector('.input-new-tag') as HTMLInputElement;
+        if (inputRef) {
+          inputRef.focus();
+        }
+      });
+    };
+
+    const addDesenField = (keyValueIndex: number) => {
+      const inputValue = formState.formData.keyValueContent[keyValueIndex].desenFieldInputValue.trim();
+      if (inputValue) {
+        formState.formData.keyValueContent[keyValueIndex].desenFieldName.push(inputValue);
+        formState.formData.keyValueContent[keyValueIndex].desenFieldInputValue = '';
+      }
+      formState.formData.keyValueContent[keyValueIndex].desenFieldInputVisible = false;
+    };
+
+    const removeDesenField = (keyValueIndex: number, fieldIndex: number) => {
+      formState.formData.keyValueContent[keyValueIndex].desenFieldName.splice(fieldIndex, 1);
     };
 
     const addGarbleSaveField = (index: number) => {
@@ -210,38 +354,38 @@ export default defineComponent({
     //   }
     // };
 
-const submitForm = async () => {
-  formState.loading = true;
-  console.log('form:', formRef.value);
-  try {
-    // 检查 formRef 是否存在
-    if (formRef.value) {
-      console.log('表单开始验证');
-      // 验证表单数据
-      await formRef.value.validate(); 
-      console.log('表单验证通过:', formState.formData);
-    } else {
-      throw new Error('Form reference is null');
+  const submitForm = async () => {
+    formState.loading = true;
+    console.log('form:', formRef.value);
+    try {
+      // 检查 formRef 是否存在
+      if (formRef.value) {
+        console.log('表单开始验证');
+        // 验证表单数据
+        await formRef.value.validate(); 
+        console.log('表单验证通过:', formState.formData);
+      } else {
+        throw new Error('Form reference is null');
+      }
+
+      // 打印要发送的数据
+      console.log('提交的数据:', formState.formData);
+
+      // 调用 API 提交数据
+      const response = await registerHandleInfo(formState.formData);
+
+      // 打印后端返回的数据
+      console.log('提交成功，后端返回:', response);
+
+      alert('提交成功');
+    } catch (error) {
+      // 打印错误信息
+      console.error('提交失败，错误信息:', error);
+      //alert(`提交失败: ${error.message}`);
+    } finally {
+      formState.loading = false;
     }
-
-    // 打印要发送的数据
-    console.log('提交的数据:', formState.formData);
-
-    // 调用 API 提交数据
-    const response = await registerHandleInfo(formState.formData);
-
-    // 打印后端返回的数据
-    console.log('提交成功，后端返回:', response);
-
-    alert('提交成功');
-  } catch (error) {
-    // 打印错误信息
-    console.error('提交失败，错误信息:', error);
-    //alert(`提交失败: ${error.message}`);
-  } finally {
-    formState.loading = false;
-  }
-};
+  };
 
 
 
@@ -254,6 +398,12 @@ const submitForm = async () => {
       formState,
       addKeyValueContent,
       addFieldContent,
+      showOriginFieldInput,
+      addOriginField,
+      removeOriginField,
+      showDesenFieldInput,
+      addDesenField,
+      removeDesenField,
       addGarbleSaveField,
       submitForm,
       resetForm
@@ -334,5 +484,23 @@ const submitForm = async () => {
 .custom-reset-button:hover {
     background-color: #007bff;
     color: #fff;
+}
+
+.origin-field-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.el-tag {
+  margin-right: 8px;
+}
+
+.input-new-tag {
+  width: 120px;
+}
+
+.button-new-tag {
+  margin-left: 8px;
 }
 </style>
