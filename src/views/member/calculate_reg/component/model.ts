@@ -2,7 +2,8 @@
 export interface CalculationForm {
     serviceID: number;
     computeType: number;
-    handle_name: number;
+    handleName: string;
+    handleID: number;
     criteria: {
         fieldName: string;
         fieldValue: string;

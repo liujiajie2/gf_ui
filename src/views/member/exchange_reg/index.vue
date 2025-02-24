@@ -20,6 +20,24 @@
               <el-input v-model="formData.handleID" placeholder="请输入HandID"></el-input>
             </el-form-item>
           </el-col>
+          <!-- handle_name -->
+          <el-col :span="24">
+            <el-form-item label="句柄名" prop="handle_name">
+              <el-input v-model="formData.handle_name" placeholder="请输入Hand Name"></el-input>
+            </el-form-item>
+          </el-col>
+          <!-- 数据交换格式 -->
+          <el-col :span="24">
+            <el-form-item label="数据交换格式" prop="format">
+              <el-input v-model="formData.format" placeholder="请输入数据交换格式"></el-input>
+            </el-form-item>
+          </el-col>
+          <!-- 数据交换协议 -->
+          <el-col :span="24">
+            <el-form-item label="数据交换协议" prop="protocol">
+              <el-input v-model="formData.protocol" placeholder="请输入protocol"></el-input>
+            </el-form-item>
+          </el-col>
         </el-row>
         <!-- 提交和重置按钮 -->
         <el-row>
