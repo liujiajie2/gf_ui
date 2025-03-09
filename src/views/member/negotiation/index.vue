@@ -14,17 +14,10 @@
               <el-input v-model="formData.serviceName" placeholder="请输入服务名"></el-input>
             </el-form-item>
           </el-col>
-
-          <!-- 提供方ID -->
-          <el-col :span="24">
-            <el-form-item label="提供方ID" prop="providerID">
-              <el-input v-model="formData.providerID" placeholder="请输入提供方ID"></el-input>
-            </el-form-item>
-          </el-col>
         </el-row>
 
         <div v-for="(field, index) in formData.fieldContent" :key="index" class="field-row">
-          <el-row :gutter="20">
+          <el-row :gutter="30">
             <el-col :span="10">
               <el-form-item label="数据库名" :prop="'fieldContent.' + index + '.databaseName'">
                 <el-input v-model="field.databaseName" placeholder="请输入数据库名"></el-input>
@@ -34,6 +27,11 @@
               <el-form-item label="数据表名" :prop="'fieldContent.' + index + '.tableName'">
                 <el-input v-model="field.tableName" placeholder="请输入数据表名"></el-input>
               </el-form-item>
+            </el-col>
+            <el-col :span="10">
+            <el-form-item label="提供方ID" prop="'fieldContent.' + index+'.providerID'">
+              <el-input v-model="field.providerID" placeholder="请输入提供方ID"></el-input>
+            </el-form-item>
             </el-col>
             <el-col :span="4" class="delete-button-col">
               <el-button type="danger" @click="removeField(index)">删除</el-button>

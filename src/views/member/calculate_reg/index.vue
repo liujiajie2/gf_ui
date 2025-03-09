@@ -109,9 +109,14 @@
     <!-- 新增的查询按钮和结果显示 -->
     <el-card shadow="hover" class="mt15">
       <el-button type="primary" @click="queryResult">查询计算结果</el-button>
-      <div v-if="resultValue" class="result-display">
-        <p>ResultValue: {{ resultValue }}</p>
-      </div>
+        <el-input
+          v-if="showResultBox"
+          v-model="resultValue"
+          type="textarea"
+          :autosize="{ minRows: 2, maxRows: 6 }"
+          placeholder="计算结果将显示在这里"
+          class="result-textarea"
+        ></el-input>
     </el-card>
 
     <!-- 数据展示部分 -->
@@ -257,6 +262,7 @@ export default defineComponent({
     // 固定的 TaskID
     const taskID = ref((0));
     const resultValue = ref('');
+    const showResultBox = ref(false); // 控制结果框的显示
 
     // WebSocket 连接
     const ws = ref<WebSocket | null>(null);
@@ -369,7 +375,7 @@ export default defineComponent({
     const handlePageChange = (page: number) => {
       currentPage.value = page;
     };
-
+    
     // 查询计算结果
     const queryResult = () => {
       if (taskID.value == 0) {
@@ -402,7 +408,7 @@ export default defineComponent({
         ws.value.onerror = (error) => {
           ElMessage.error('WebSocket 错误: ' + error);
         };
-
+        showResultBox.value = true;
         // if (ws.value.readyState == WebSocket.OPEN) {
         //   ws.value.send(JSON.stringify({ taskID: taskID.value }));
         // } else {
@@ -438,7 +444,8 @@ export default defineComponent({
       paginatedTableData,
       currentPage,
       pageSize,
-      handlePageChange
+      handlePageChange,
+      showResultBox, 
     };
   },
 });
@@ -472,6 +479,7 @@ export default defineComponent({
 
 .button-container {
   display: flex;
+  align-items: center; /* 垂直居中对齐 */
   gap: 10px; /* 添加按钮间的间距 */
 }
 
@@ -523,4 +531,15 @@ export default defineComponent({
   text-align: center;
 }
 
+/* 新增的样式 */
+.result-textarea {
+  flex: 1; /* 使文本框自适应宽度 */
+  margin-left: 10px; /* 添加按钮和文本框之间的间距 */
+  width: 400px; /* 确保文本框宽度自适应 */
+  height : 80 px ; 
+  text-align : left ; 
+  display : fles ; 
+  align-items: center;
+  justify-content: flex-end ;
+}
 </style>
