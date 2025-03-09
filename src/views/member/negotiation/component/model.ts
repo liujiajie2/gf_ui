@@ -5,9 +5,14 @@ export interface FieldContent {
 export interface NegotiationFormState {
     formData: {
         serviceName: string;
-        providerID: number | null; // 将类型改为 number | null
+        providers: {
+            providerID:string
+            filedContent:{
+                databaseName:string
+                tableName:string
+            }[]
+        }[]
         serviceOwnerID: number | null;
-        filedContent: FieldContent[];
     };
     rules: {
         [key: string]: any;
@@ -30,9 +35,8 @@ export function getDefaultNegotiationFormState(): NegotiationFormState {
     return {
         formData: {
             serviceName: '',
-            providerID: null, // 初始化为 null
+            providers:[],
             serviceOwnerID: null,
-            filedContent: [],
         },
         rules: {
             serviceName: [{ required: true, message: '请输入服务名', trigger: 'blur' }],
