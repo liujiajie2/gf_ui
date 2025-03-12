@@ -7,6 +7,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "serve": "vite serve",
+    "container1":"vite serve --mode container1",
+    "container2":"vite serve --mode container2",
+    "container3":"vite serve --mode container3",
     "build": "vite build",
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue src/"
   },

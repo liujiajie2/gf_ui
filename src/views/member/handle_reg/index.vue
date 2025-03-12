@@ -18,15 +18,15 @@
         <el-form-item label="句柄类型" prop="handleType">
           <el-input v-model="formState.formData.handleType"></el-input>
         </el-form-item>
-        <el-form-item label="提供方ID" prop="providerID">
-          <el-input type="number" v-model="formState.formData.providerID"></el-input>
-        </el-form-item>
-        <el-form-item label="数据库名" prop="databaseName">
-          <el-input v-model="formState.formData.databaseName"></el-input>
-        </el-form-item>
 
         <!-- 键值对内容部分 -->
         <div v-for="(keyValue, index) in formState.formData.keyValueContent" :key="index" class="key-value-section">
+          <el-form-item label="提供方ID" prop="providerID">
+            <el-input type="number" v-model="keyValue.providerID"></el-input>
+          </el-form-item>
+          <el-form-item label="数据库名" prop="databaseName">
+            <el-input v-model="keyValue.databaseName"></el-input>
+          </el-form-item>
           <el-form-item label="乱码键值名" prop="keyValueName">
             <el-input v-model="keyValue.keyValueName"></el-input>
           </el-form-item>

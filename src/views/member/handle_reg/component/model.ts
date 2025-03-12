@@ -39,8 +39,6 @@ export interface RegistrationFormState {
         serviceID: number;
         handleName: string;
         handleType: string;
-        providerID: number;
-        databaseName: string;
         keyValueCount: number;
         keyValueContent: KeyValueContent[];
     };
@@ -58,8 +56,6 @@ export function getDefaultFormState(): RegistrationFormState {
             serviceID: 0,
             handleName: '',
             handleType: '',
-            providerID: 0,
-            databaseName: '',
             keyValueCount: 0,
             keyValueContent: []
         },

@@ -1,11 +1,11 @@
-version: "3"
+
 services:
-  frontend:
+  frontend1:
     build:
       context: .
       dockerfile: Dockerfile
     image: biz_service_frontend
-    container_name: biz_service_frontend
+    container_name: biz_service_frontend1
     volumes:
       - .:/app
       - /app/node_modules
@@ -13,4 +13,32 @@ services:
       - "8888:8888"
     environment:
       - NODE_ENV=development
-    command: npm run dev
+    command: npm run container1
+  frontend2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: biz_service_frontend
+    container_name: biz_service_frontend2
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8889:8888"
+    environment:
+      - NODE_ENV=development1
+    command: npm run container2
+  frontend3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: biz_service_frontend
+    container_name: biz_service_frontend3
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8890:8888"
+    environment:
+      - NODE_ENV=development2
+    command: npm run container3

@@ -80,6 +80,7 @@
                     <el-select v-model="identifier.fieldName" multiple placeholder="请选择标识符名">
                       <el-option label="CUSTOMERID" value="CUSTOMERID"></el-option>
                       <el-option label="phonenumber" value="phonenumber"></el-option>
+                      <el-option label="id_card" value="id_card"></el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
