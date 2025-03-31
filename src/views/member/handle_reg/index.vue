@@ -27,23 +27,7 @@
           <el-form-item label="数据库名" prop="databaseName">
             <el-input v-model="keyValue.databaseName"></el-input>
           </el-form-item>
-          <el-form-item label="乱码键值名" prop="keyValueName">
-            <el-input v-model="keyValue.keyValueName"></el-input>
-          </el-form-item>
-          <el-form-item label="安全存储表名" prop="secureTableName">
-            <el-input v-model="keyValue.secureTableName"></el-input>
-          </el-form-item>
-          <el-form-item label="字段数量" prop="fieldCount">
-            <el-input type="number" v-model="keyValue.fieldCount" readonly></el-input>
-          </el-form-item>
 
-          <!-- 新增字段内容 -->
-          <div v-for="(field, fieldIndex) in keyValue.fieldContent" :key="fieldIndex" class="field-content-item">
-            <el-form-item label="字段名" prop="fieldName">
-              <el-input v-model="field.fieldName"></el-input>
-            </el-form-item>
-          </div>
-          <el-button @click="addFieldContent(index)" type="primary" class="add-button">增加字段内容</el-button>
 
           <!-- 其他信息 -->
           <el-form-item label="拼接算法动态库名" prop="libName">
@@ -111,79 +95,7 @@
             </div>
           </el-form-item>
 
-          <el-form-item label="原始表名" prop="originTableName">
-            <el-input v-model="keyValue.originTableName"></el-input>
-          </el-form-item>
-
-          <!-- 原始表中字段内容 -->
-          <el-form-item label="原始表中字段内容" prop="originFieldName">
-            <div class="origin-field-tags">
-              <!-- 显示已输入的标签 -->
-              <el-tag
-                v-for="(field, fieldIndex) in keyValue.originFieldName"
-                :key="fieldIndex"
-                closable
-                @close="removeOriginField(index, fieldIndex)">
-                {{ field }}
-              </el-tag>
-              
-              <!-- 动态输入框 -->
-              <el-input
-                v-if="keyValue.originFieldInputVisible"
-                v-model="keyValue.originFieldInputValue"
-                class="input-new-tag"
-                size="small"
-                @keyup.enter="addOriginField(index)"
-                @blur="addOriginField(index)"
-              />
-              
-              <!-- 显示新增按钮 -->
-              <el-button
-                v-else
-                class="button-new-tag"
-                size="small"
-                @click="showOriginFieldInput(index)">
-                + 新增字段
-              </el-button>
-            </div>
-          </el-form-item>
-
-          <el-form-item label="原始表对应脱敏表名" prop="desenTableName">
-            <el-input v-model="keyValue.desenTableName"></el-input>
-          </el-form-item>
-
-          <!-- 原始表中字段内容 -->
-          <el-form-item label="脱敏表中字段内容" prop="desenFieldName">
-            <div class="desen-field-tags">
-              <!-- 显示已输入的标签 -->
-              <el-tag
-                v-for="(field, fieldIndex) in keyValue.desenFieldName"
-                :key="fieldIndex"
-                closable
-                @close="removeDesenField(index, fieldIndex)">
-                {{ field }}
-              </el-tag>
-              
-              <!-- 动态输入框 -->
-              <el-input
-                v-if="keyValue.desenFieldInputVisible"
-                v-model="keyValue.desenFieldInputValue"
-                class="input-new-tag"
-                size="small"
-                @keyup.enter="addDesenField(index)"
-                @blur="addDesenField(index)"
-              />
-              
-              <!-- 显示新增按钮 -->
-              <el-button
-                v-else
-                class="button-new-tag"
-                size="small"
-                @click="showDesenFieldInput(index)">
-                + 新增字段
-              </el-button>
-            </div>
-          </el-form-item>
+          
 
           <el-form-item label="数据交换格式" prop="format">
             <el-input v-model="keyValue.format"></el-input>
